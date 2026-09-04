@@ -1,17 +1,15 @@
 import React from 'react';
+import PageHeader from '../components/common/PageHeader';
 import ContactInformation from '../components/about/ContactInformation';
 
 const Contact = () => {
   return (
     <div className="min-h-screen pt-20">
-      <div className="bg-white border-b border-neutral-100 py-20 text-center px-4">
-        <h1 className="text-4xl md:text-5xl font-heading font-bold text-neutral-900 mb-6">
-          Contact Us
-        </h1>
-        <p className="text-lg text-neutral-700 max-w-2xl mx-auto font-light">
-          Have questions about our trainings or the DORN Method? Reach out to us, and we'll get back to you as soon as possible.
-        </p>
-      </div>
+      <PageHeader 
+        title="Contact Us" 
+        description="Have questions about our trainings or the DORN Method? Reach out to us, and we'll get back to you as soon as possible."
+        breadcrumbs={[{ label: 'Contact Us' }]} 
+      />
       
       <div className="py-12 bg-white">
         <ContactInformation />
