@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from '../common/Button';
 import { CheckCircle } from 'lucide-react';
-import heroImg from '../../assets/dornmethodlogo.png';
 
 const IntroSection = () => {
   const features = [
@@ -17,15 +16,11 @@ const IntroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-16">
           <div className="lg:w-1/2 w-full">
             <div className="relative">
-              <div className="absolute inset-0 bg-dorn transform translate-x-4 translate-y-4 rounded-xl -z-10 opacity-20"></div>
               <img 
-                src={heroImg} 
-                alt="DORN Method practice" 
-                className="w-full h-[500px] object-cover rounded-xl shadow-lg bg-neutral-200"
+                src="https://dorn-finder.de/assets/img/globe_home2.png" 
+                alt="World Map Banner" 
+                className="w-full h-auto object-cover"
               />
-              <div className="hidden absolute inset-0 bg-neutral-200 rounded-xl shadow-lg items-center justify-center text-neutral-500">
-                Image Placeholder
-              </div>
             </div>
           </div>
           

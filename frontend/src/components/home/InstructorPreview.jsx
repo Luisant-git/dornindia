@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../common/Button';
+import instructorImg from '../../assets/dr.subashmani.webp';
 
 const InstructorPreview = () => {
   return (
@@ -14,7 +15,7 @@ const InstructorPreview = () => {
             <span className="text-dorn uppercase tracking-widest text-sm font-bold mb-4 block">
               Meet Your Instructor
             </span>
-            <h2 className="text-4xl md:text-5xl font-heading mb-2">
+            <h2 className="text-4xl md:text-5xl font-heading mb-2 text-white">
               Dr. K. Subash Mani
             </h2>
             <div className="text-xl text-neutral-400 mb-8 font-light">
@@ -34,17 +35,10 @@ const InstructorPreview = () => {
             <div className="relative max-w-md mx-auto">
               <div className="absolute inset-0 bg-dorn transform -translate-x-4 translate-y-4 rounded-xl -z-10"></div>
               <img 
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800" 
+                src={instructorImg} 
                 alt="Dr. K. Subash Mani" 
                 className="w-full aspect-[4/5] object-cover rounded-xl shadow-2xl border-4 border-neutral-800"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
               />
-              <div className="hidden absolute inset-0 bg-neutral-800 rounded-xl shadow-2xl border-4 border-neutral-800 items-center justify-center text-neutral-500">
-                Instructor Image
-              </div>
             </div>
           </div>
         </div>

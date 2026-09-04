@@ -5,7 +5,6 @@ import ProfessionalJourney from '../components/about/ProfessionalJourney';
 import DornMethodIndia from '../components/about/DornMethodIndia';
 import DornHistory from '../components/about/DornHistory';
 import CodeOfEthics from '../components/about/CodeOfEthics';
-import ContactInformation from '../components/about/ContactInformation';
 
 const About = () => {
   return (

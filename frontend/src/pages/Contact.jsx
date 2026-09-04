@@ -4,7 +4,7 @@ import ContactInformation from '../components/about/ContactInformation';
 const Contact = () => {
   return (
     <div className="min-h-screen pt-20">
-      <div className="bg-dorn-light py-20 text-center px-4">
+      <div className="bg-white border-b border-neutral-100 py-20 text-center px-4">
         <h1 className="text-4xl md:text-5xl font-heading font-bold text-neutral-900 mb-6">
           Contact Us
         </h1>
