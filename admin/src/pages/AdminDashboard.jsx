@@ -17,12 +17,13 @@ const AdminDashboard = () => {
   useEffect(() => {
     const storedTherapists = JSON.parse(localStorage.getItem('admin_therapists')) || [...instructors, ...advancedTherapists, ...generalTherapists];
     const storedClasses = JSON.parse(localStorage.getItem('admin_classes')) || classes;
+    const storedTutorials = JSON.parse(localStorage.getItem('admin_tutorials')) || tutorials;
 
     setStats({
       therapists: storedTherapists.length,
       classes: storedClasses.length,
       testimonials: testimonials.length,
-      tutorials: tutorials.length
+      tutorials: storedTutorials.length
     });
   }, []);
 

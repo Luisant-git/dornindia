@@ -6,6 +6,7 @@ import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminTherapists from './pages/AdminTherapists'
 import AdminClasses from './pages/AdminClasses'
+import AdminTutorials from './pages/AdminTutorials'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<AdminDashboard />} />
             <Route path="/therapists" element={<AdminTherapists />} />
             <Route path="/classes" element={<AdminClasses />} />
+            <Route path="/tutorials" element={<AdminTutorials />} />
           </Route>
         </Route>
         
