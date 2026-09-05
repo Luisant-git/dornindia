@@ -44,7 +44,7 @@ const ClassCard = ({ classItem }) => {
             to="/contact" 
             className="inline-flex items-center px-5 py-2.5 border border-dorn text-dorn bg-white hover:bg-dorn hover:text-white rounded-full font-medium transition-colors group"
           >
-            View Class
+            Register Class
             <ArrowRight size={18} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
