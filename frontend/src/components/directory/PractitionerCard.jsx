@@ -26,11 +26,14 @@ const PractitionerCard = ({ practitioner, isGeneral = false }) => {
             <span className="text-sm text-dorn font-semibold">{practitioner.title}</span>
           </div>
           <div className="flex flex-wrap gap-y-1 gap-x-4 text-xs text-neutral-600">
+            {practitioner.batch && (
+              <span className="flex items-center"><Calendar size={14} className="mr-1 flex-shrink-0 text-neutral-400"/> Batch: {practitioner.batch}</span>
+            )}
             {practitioner.address && (
               <span className="flex items-start"><MapPin size={14} className="mr-1 mt-0.5 flex-shrink-0 text-neutral-400"/> {practitioner.address}</span>
             )}
             {practitioner.date && (
-              <span className="flex items-center"><Calendar size={14} className="mr-1 flex-shrink-0 text-neutral-400"/> {practitioner.date}</span>
+              <span className="flex items-center"><Calendar size={14} className="mr-1 flex-shrink-0 text-neutral-400"/> Date: {practitioner.date}</span>
             )}
           </div>
         </div>

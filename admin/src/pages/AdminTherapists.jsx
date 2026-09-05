@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Edit2, Trash2, Search, Eye, SquarePen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Eye, SquarePen, ChevronLeft, ChevronRight, Upload, User } from 'lucide-react';
 import { instructors, advancedTherapists, generalTherapists } from '../../../frontend/src/data/therapistsData';
 
 const AdminTherapists = () => {
@@ -12,12 +12,12 @@ const AdminTherapists = () => {
   const [isViewMode, setIsViewMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
+    profile: null,
     name: '',
-    title: '',
+    designation: '',
     address: '',
-    phone: '',
-    email: '',
-    category: 'general'
+    batch: '',
+    date: ''
   });
 
   useEffect(() => {
@@ -46,15 +46,15 @@ const AdminTherapists = () => {
       setEditingId(therapist.id);
       setFormData({
         name: therapist.name || '',
-        title: therapist.title || '',
+        designation: therapist.title || '',
         address: therapist.address || '',
-        phone: therapist.phone || '',
-        email: therapist.email || '',
-        category: therapist.category || 'general'
+        batch: therapist.batch || '',
+        date: therapist.date || '',
+        profile: therapist.image || null
       });
     } else {
       setEditingId(null);
-      setFormData({ name: '', title: '', address: '', phone: '', email: '', category: 'general' });
+      setFormData({ profile: null, name: '', designation: '', address: '', batch: '', date: '' });
     }
     setIsModalOpen(true);
   };
@@ -68,13 +68,18 @@ const AdminTherapists = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const payload = {
+      ...formData,
+      title: formData.designation,
+      image: formData.profile
+    };
     if (editingId) {
-      const updated = therapists.map(t => t.id === editingId ? { ...t, ...formData } : t);
+      const updated = therapists.map(t => t.id === editingId ? { ...t, ...payload } : t);
       saveToStorage(updated);
     } else {
       const newTherapist = {
         id: `t-${Date.now()}`,
-        ...formData
+        ...payload
       };
       saveToStorage([newTherapist, ...therapists]);
     }
@@ -82,8 +87,7 @@ const AdminTherapists = () => {
   };
 
   const filteredTherapists = therapists.filter(t => 
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (t.address && t.address.toLowerCase().includes(searchTerm.toLowerCase()))
+    t.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredTherapists.length / itemsPerPage);
@@ -133,9 +137,9 @@ const AdminTherapists = () => {
             <thead>
               <tr className="bg-neutral-50/50 text-neutral-500 text-xs uppercase tracking-wider font-semibold border-b border-neutral-100">
                 <th className="p-4 font-medium">Name</th>
-                <th className="p-4 font-medium">Category</th>
-                <th className="p-4 font-medium">Location</th>
-                <th className="p-4 font-medium">Contact</th>
+                <th className="p-4 font-medium">Designation</th>
+                <th className="p-4 font-medium">Batch</th>
+                <th className="p-4 font-medium">Date</th>
                 <th className="p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
@@ -144,24 +148,12 @@ const AdminTherapists = () => {
                 <tr key={t.id} className="hover:bg-neutral-50/80 transition-colors group">
                   <td className="p-4">
                     <div className="font-semibold text-navy group-hover:text-[#00a3e0] transition-colors">{t.name}</div>
-                    <div className="text-xs text-neutral-500 mt-0.5">{t.title}</div>
-                  </td>
-                  <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize shadow-sm border
-                      ${t.category === 'instructor' ? 'bg-purple-50 text-purple-700 border-purple-200/60' : 
-                        t.category === 'advanced' ? 'bg-blue-50 text-blue-700 border-blue-200/60' : 
-                        'bg-emerald-50 text-emerald-700 border-emerald-200/60'}`}
-                    >
-                      {t.category}
-                    </span>
-                  </td>
-                  <td className="p-4 text-sm text-neutral-600 max-w-[12rem] truncate" title={t.address}>
-                    {t.address || '-'}
                   </td>
                   <td className="p-4 text-sm text-neutral-600">
-                    <div className="font-medium">{t.phone || '-'}</div>
-                    <div className="text-xs text-neutral-400 mt-0.5">{t.email || ''}</div>
+                    <span className="capitalize">{t.title || '-'}</span>
                   </td>
+                  <td className="p-4 text-sm text-neutral-600">{t.batch || '-'}</td>
+                  <td className="p-4 text-sm text-neutral-600">{t.date || '-'}</td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2 transition-opacity">
                       <button onClick={() => handleOpenModal(t, true)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-emerald-100" title="View">
@@ -227,14 +219,42 @@ const AdminTherapists = () => {
                 {isViewMode ? (
                   <div className="space-y-4 pt-2">
                     <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Full Name:</strong> {formData.name || '-'}</div>
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Email Address:</strong> {formData.email || '-'}</div>
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Phone Number:</strong> {formData.phone || '-'}</div>
+                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Designation:</strong> {formData.designation || '-'}</div>
                     <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Address / Location:</strong> {formData.address || '-'}</div>
-                    <div className="text-[15px] text-neutral-800 capitalize"><strong className="text-black font-bold">Category:</strong> {formData.category || '-'}</div>
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Professional Title:</strong> {formData.title || '-'}</div>
+                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Batch:</strong> {formData.batch || '-'}</div>
+                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Completed Date:</strong> {formData.date || '-'}</div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Profile Image</label>
+                      <div className="flex flex-col sm:flex-row items-center gap-6 w-full p-6 bg-neutral-50/60 border border-neutral-200 rounded-xl">
+                        <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 bg-white border border-neutral-200 shadow-sm flex items-center justify-center">
+                          {formData.profile ? (
+                            <img src={formData.profile} alt="Profile preview" className="w-full h-full object-cover" />
+                          ) : (
+                            <User size={52} className="text-neutral-300" />
+                          )}
+                        </div>
+                        <div className="flex flex-col items-center sm:items-start gap-3 flex-grow text-center sm:text-left">
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                            <label className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#00a3e0] hover:bg-[#0082b3] text-white text-sm font-semibold cursor-pointer transition-colors shadow-sm">
+                              <Upload size={16} />
+                              Upload Photo
+                              <input type="file" accept="image/*" className="hidden" onChange={e => setFormData({...formData, profile: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null})} />
+                            </label>
+                            {formData.profile && (
+                              <button type="button" onClick={() => setFormData({...formData, profile: null})} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-neutral-200 bg-white text-neutral-500 hover:text-red-600 hover:border-red-200 text-sm font-medium transition-colors">
+                                <Trash2 size={15} />
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                          <span className="text-xs text-neutral-400">JPG or PNG</span>
+                        </div>
+                      </div>
+                    </div>
                     
                     <div>
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Full Name <span className="text-red-500">*</span></label>
@@ -242,32 +262,23 @@ const AdminTherapists = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Email Address <span className="text-red-500">*</span></label>
-                      <input type="email" placeholder="Email address" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Designation</label>
+                      <input type="text" placeholder="Designation" value={formData.designation} onChange={e => setFormData({...formData, designation: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
                     
-                    <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
-                      <input type="text" placeholder="Phone number" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Address / Location <span className="text-red-500">*</span></label>
+                    <div className="md:col-span-2">
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Address / Location</label>
                       <input type="text" placeholder="Address or location" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
 
                     <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Category <span className="text-red-500">*</span></label>
-                      <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white cursor-pointer">
-                        <option value="general">General Therapist</option>
-                        <option value="advanced">Advanced Therapist</option>
-                        <option value="instructor">Instructor</option>
-                      </select>
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Batch</label>
+                      <input type="text" placeholder="Batch (e.g. Chennai)" value={formData.batch} onChange={e => setFormData({...formData, batch: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Professional Title</label>
-                      <input type="text" placeholder="Professional title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
+                    <div>
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Completed Date</label>
+                      <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
                     </div>
                     
                   </div>

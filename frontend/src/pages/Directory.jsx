@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 import { instructors, advancedTherapists, generalTherapists } from '../data/therapistsData';
 import PractitionerCard from '../components/directory/PractitionerCard';
 import PageHeader from '../components/common/PageHeader';
 
 const Directory = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterBatch, setFilterBatch] = useState('all');
+  const [filterYear, setFilterYear] = useState('all');
+
+  const filters = useMemo(() => {
+    const batches = [...new Set(generalTherapists.map(t => t.batch).filter(Boolean))].sort();
+    const years = [...new Set(generalTherapists.map(t => t.date ? t.date.slice(-4) : null).filter(Boolean))].sort();
+    return { batches, years };
+  }, []);
+
+  const filteredTherapists = generalTherapists.filter(t => {
+    const nameMatch = t.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const batchMatch = filterBatch === 'all' || t.batch === filterBatch;
+    const yearMatch = filterYear === 'all' || (t.date && t.date.slice(-4) === filterYear);
+    return nameMatch && batchMatch && yearMatch;
+  });
+
   return (
     <div className="min-h-screen pt-20 bg-neutral-50">
       <PageHeader 
@@ -96,11 +114,41 @@ const Directory = () => {
             <h3 className="text-xl font-heading font-bold text-navy mb-6">
               Below: Therapist Directory 1 to 970 (2012 --- 2018)
             </h3>
-            
+
+            <div className="flex flex-col md:flex-row gap-4 bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-8">
+              <div className="relative flex-grow">
+                <input 
+                  type="text" 
+                  placeholder="Search by name..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white"
+                />
+                <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+              </div>
+              <select value={filterBatch} onChange={e => setFilterBatch(e.target.value)} className="px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white cursor-pointer">
+                <option value="all">All Batches</option>
+                {filters.batches.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+              <select value={filterYear} onChange={e => setFilterYear(e.target.value)} className="px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white cursor-pointer">
+                <option value="all">All Years</option>
+                {filters.years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
+
+            <div className="text-sm text-neutral-500 mb-4">
+              <strong className="text-navy">{filteredTherapists.length}</strong> Therapists
+            </div>
+
             <div className="flex flex-col gap-3">
-              {generalTherapists.map((practitioner) => (
+              {filteredTherapists.map((practitioner) => (
                 <PractitionerCard key={practitioner.id} practitioner={practitioner} isGeneral={true} />
               ))}
+              {filteredTherapists.length === 0 && (
+                <div className="bg-white p-8 rounded-2xl text-center text-neutral-500 shadow-sm border border-neutral-100">
+                  No therapists found.
+                </div>
+              )}
             </div>
           </div>
 
