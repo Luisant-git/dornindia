@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { TherapistService } from './therapist.service';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateTherapistDto } from './dto/create-therapist.dto';
+import { UpdateTherapistDto } from './dto/update-therapist.dto';
 
 @ApiTags('therapists')
 @Controller('therapists')
@@ -8,7 +10,7 @@ export class TherapistController {
   constructor(private readonly therapistService: TherapistService) {}
 
   @Post()
-  create(@Body() createData: any) {
+  create(@Body() createData: CreateTherapistDto) {
     return this.therapistService.create(createData);
   }
 
@@ -23,7 +25,7 @@ export class TherapistController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateData: any) {
+  update(@Param('id') id: string, @Body() updateData: UpdateTherapistDto) {
     return this.therapistService.update(+id, updateData);
   }
 

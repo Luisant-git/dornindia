@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { ClassService } from './class.service';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateClassDto } from './dto/create-class.dto';
+import { UpdateClassDto } from './dto/update-class.dto';
 
 @ApiTags('classes')
 @Controller('classes')
@@ -8,7 +10,7 @@ export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   @Post()
-  create(@Body() createData: any) {
+  create(@Body() createData: CreateClassDto) {
     return this.classService.create(createData);
   }
 
@@ -23,7 +25,7 @@ export class ClassController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateData: any) {
+  update(@Param('id') id: string, @Body() updateData: UpdateClassDto) {
     return this.classService.update(+id, updateData);
   }
 
