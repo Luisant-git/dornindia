@@ -18,11 +18,11 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-white text-navy flex flex-col h-screen sticky top-0 border-r border-neutral-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)] relative overflow-hidden">
+    <div className="w-64 bg-navy text-white flex flex-col h-screen sticky top-0 border-r border-navy/90 shadow-xl relative overflow-hidden">
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-1">
-          <img src="/favicon.png" alt="Dorn India" className="w-10 h-10 object-contain" />
-          <h2 className="text-xl font-heading font-bold tracking-wide text-navy">Dorn India</h2>
+        <div className="font-heading font-bold text-xl tracking-wider flex items-center text-white">
+          <img src="/favicon.png" alt="Dorn India Logo" className="h-10 w-auto mr-3 object-contain bg-white rounded-full p-1 shadow-sm border border-neutral-100" />
+          DORN INDIA
         </div>
       </div>
 
@@ -35,11 +35,11 @@ const Sidebar = () => {
               to={item.path}
               className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                 isActive 
-                  ? 'text-[#00a3e0] font-bold bg-[#00a3e0]/5' 
-                  : 'text-neutral-500 hover:text-navy hover:bg-neutral-50 font-bold'
+                  ? 'text-white font-bold bg-[#00a3e0]' 
+                  : 'text-white hover:bg-white/10 font-bold'
               }`}
             >
-              <div className={`transition-colors duration-200 ${isActive ? 'text-[#00a3e0]' : 'text-neutral-400 group-hover:text-navy'}`}>
+              <div className="text-white transition-colors duration-200">
                 {item.icon}
               </div>
               <span className="tracking-wide text-sm">{item.name}</span>
@@ -48,10 +48,10 @@ const Sidebar = () => {
         })}
       </nav>
 
-      <div className="p-6 relative z-10 bg-white">
+      <div className="p-6 relative z-10 bg-navy">
         <button 
           onClick={handleLogout}
-          className="flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-neutral-500 hover:bg-red-50 hover:text-red-600 transition-all duration-300 w-full text-sm font-medium"
+          className="flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-neutral-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 w-full text-sm font-medium"
         >
           <LogOut size={18} />
           <span>Sign Out</span>

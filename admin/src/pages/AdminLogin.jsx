@@ -21,12 +21,11 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
       <div className="bg-white p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-neutral-200 max-w-md w-full relative z-10 animate-in fade-in zoom-in-95 duration-500">
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-2xl bg-[#00a3e0] mx-auto mb-6 flex items-center justify-center shadow-md">
-            <span className="font-heading font-bold text-3xl text-white">D</span>
+        <div className="flex justify-center mb-10">
+          <div className="font-heading font-bold text-2xl tracking-wider flex items-center text-navy">
+            <img src="/favicon.png" alt="Dorn India Logo" className="h-12 w-auto mr-3 object-contain bg-white rounded-full p-1 shadow-sm border border-neutral-100" />
+            DORN INDIA
           </div>
-          <h1 className="text-3xl font-heading font-bold text-navy tracking-tight">Admin Console</h1>
-          <p className="text-neutral-500 mt-2">Dorn Method India</p>
         </div>
 
         {error && (
