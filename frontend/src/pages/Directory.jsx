@@ -7,9 +7,9 @@ const Directory = () => {
   return (
     <div className="min-h-screen pt-20 bg-neutral-50">
       <PageHeader 
-        title={<>Dorn Directory <span className="text-dorn">India</span></>}
+        title="Dorn Directory India"
         description="Find recognized Dorn Method Instructors and Therapists across India."
-        breadcrumbs={[{ label: 'Directory' }]} 
+        breadcrumbs={[{ label: 'Directory India' }]} 
       />
 
       <section className="py-16 bg-neutral-50">
@@ -17,17 +17,17 @@ const Directory = () => {
           
           {/* Disclaimer / Info block */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-neutral-100 mb-12">
-            <h3 className="text-xl font-heading font-bold text-navy mb-4">Important Information</h3>
+            <h3 className="text-xl font-heading font-bold text-navy mb-4">Directory Guidelines</h3>
             <p className="text-neutral-700 mb-4">
-              <strong className="text-dorn-dark">This Directory is not a recommendation about a Therapist; it is only intended as General Information.</strong>
+              <strong className="text-dorn-dark">Please note that the practitioners listed in this directory are provided for informational purposes only and do not constitute an official endorsement or recommendation.</strong>
             </p>
             <p className="text-neutral-600 mb-4">
-              To be listed in this Directory requires a recommendation (approval) of an authorized DORN Instructor (Minimum a Basic Training plus a review or advanced training must be confirmed).
+              Inclusion in this database requires formal approval from a recognized DORN Instructor. At a minimum, practitioners must have successfully completed foundational training alongside verified advanced coursework or review sessions.
             </p>
             <div className="bg-dorn-light/30 border-l-4 border-dorn p-4 rounded-r-lg">
               <p className="text-navy text-sm font-medium">
-                The path to become a DORN Instructor (tutor):<br/>
-                Special Instructor training completed with Dr Subash (AIDHA) or Thomas Zudrell (Head of DORN International), and examination is required to teach DORN!
+                How to achieve Instructor Status:<br/>
+                To officially teach the DORN Method, candidates must complete a specialized instructor program under the guidance of Dr. Subash (AIDHA) or Thomas Zudrell (DORN International), culminating in a mandatory examination.
               </p>
             </div>
           </div>
@@ -43,7 +43,7 @@ const Directory = () => {
             </div>
             
             <p className="text-center text-neutral-600 mb-8 max-w-3xl mx-auto">
-              These are presently the only recognized and authorized Dorn Method Instructors in India following all Guidelines established by AHHAI and the Dorn International Department.
+              The individuals below are currently the only certified DORN Method Instructors operating in India who adhere strictly to the protocols set forth by AHHAI and DORN International.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -82,7 +82,7 @@ const Directory = () => {
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-100 mb-8 text-center">
               <p className="text-neutral-700 font-medium">
-                For the inquiry of any contact details regarding the therapists below, you can contact the following members:
+                Should you require contact information for any of the therapists listed in our general directory, please reach out to our dedicated support team members below:
               </p>
               <div className="flex flex-wrap justify-center gap-4 mt-4 text-sm text-dorn-dark">
                 <span>Dr. K.Subash mani - 9841055297</span>
