@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, Link2 } from 'lucide-react';
 import { tutorials as initialTutorials } from '../../../frontend/src/data/tutorials';
+import { useToast } from '../components/Toast';
 
 const AdminTutorials = () => {
+  const toast = useToast();
   const [tutorialsList, setTutorialsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,6 +58,7 @@ const AdminTutorials = () => {
     if (window.confirm('Are you sure you want to delete this tutorial?')) {
       const updated = tutorialsList.filter(t => t.id !== id);
       saveToStorage(updated);
+      toast.success('Tutorial deleted successfully');
     }
   };
 
@@ -64,12 +67,14 @@ const AdminTutorials = () => {
     if (editingId) {
       const updated = tutorialsList.map(t => t.id === editingId ? { ...t, ...formData } : t);
       saveToStorage(updated);
+      toast.success('Tutorial updated successfully');
     } else {
       const newTutorial = {
         id: `t-${Date.now()}`,
         ...formData
       };
       saveToStorage([newTutorial, ...tutorialsList]);
+      toast.success('Tutorial added successfully');
     }
     setIsModalOpen(false);
   };

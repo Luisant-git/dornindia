@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Search, Eye, SquarePen, ChevronLeft, ChevronRight, Upload, User } from 'lucide-react';
 import { instructors, advancedTherapists, generalTherapists } from '../../../frontend/src/data/therapistsData';
+import { useToast } from '../components/Toast';
 
 const AdminTherapists = () => {
+  const toast = useToast();
   const [therapists, setTherapists] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,6 +65,7 @@ const AdminTherapists = () => {
     if (window.confirm('Are you sure you want to delete this therapist?')) {
       const updated = therapists.filter(t => t.id !== id);
       saveToStorage(updated);
+      toast.success('Therapist deleted successfully');
     }
   };
 
@@ -76,12 +79,14 @@ const AdminTherapists = () => {
     if (editingId) {
       const updated = therapists.map(t => t.id === editingId ? { ...t, ...payload } : t);
       saveToStorage(updated);
+      toast.success('Therapist updated successfully');
     } else {
       const newTherapist = {
         id: `t-${Date.now()}`,
         ...payload
       };
       saveToStorage([newTherapist, ...therapists]);
+      toast.success('Therapist added successfully');
     }
     setIsModalOpen(false);
   };

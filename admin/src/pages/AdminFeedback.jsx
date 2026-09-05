@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, Star, StarHalf, User } from 'lucide-react';
 import { testimonials as initialTestimonials } from '../../../frontend/src/data/testimonials';
+import { useToast } from '../components/Toast';
 
 const AdminFeedback = () => {
+  const toast = useToast();
   const [feedbacksList, setFeedbacksList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,6 +58,7 @@ const AdminFeedback = () => {
     if (window.confirm('Are you sure you want to delete this feedback?')) {
       const updated = feedbacksList.filter(f => f.id !== id);
       saveToStorage(updated);
+      toast.success('Feedback deleted successfully');
     }
   };
 
@@ -64,12 +67,14 @@ const AdminFeedback = () => {
     if (editingId) {
       const updated = feedbacksList.map(f => f.id === editingId ? { ...f, ...formData } : f);
       saveToStorage(updated);
+      toast.success('Feedback updated successfully');
     } else {
       const newFeedback = {
         id: `fb-${Date.now()}`,
         ...formData
       };
       saveToStorage([newFeedback, ...feedbacksList]);
+      toast.success('Feedback added successfully');
     }
     setIsModalOpen(false);
   };

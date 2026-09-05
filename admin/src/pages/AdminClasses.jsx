@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload } from 'lucide-react';
 import { classes as initialClasses } from '../../../frontend/src/data/classes';
+import { useToast } from '../components/Toast';
 
 const AdminClasses = () => {
+  const toast = useToast();
   const [classesList, setClassesList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,6 +62,7 @@ const AdminClasses = () => {
     if (window.confirm('Are you sure you want to delete this class?')) {
       const updated = classesList.filter(c => c.id !== id);
       saveToStorage(updated);
+      toast.success('Class deleted successfully');
     }
   };
 
@@ -72,12 +75,14 @@ const AdminClasses = () => {
     if (editingId) {
       const updated = classesList.map(c => c.id === editingId ? { ...c, ...payload } : c);
       saveToStorage(updated);
+      toast.success('Class updated successfully');
     } else {
       const newClass = {
         id: `c-${Date.now()}`,
         ...payload
       };
       saveToStorage([newClass, ...classesList]);
+      toast.success('Class added successfully');
     }
     setIsModalOpen(false);
   };

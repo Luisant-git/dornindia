@@ -8,10 +8,12 @@ import AdminTherapists from './pages/AdminTherapists'
 import AdminClasses from './pages/AdminClasses'
 import AdminTutorials from './pages/AdminTutorials'
 import AdminFeedback from './pages/AdminFeedback'
+import { ToastProvider } from './components/Toast'
 
 function App() {
   return (
     <BrowserRouter>
+      <ToastProvider>
       <Routes>
         <Route path="/login" element={<AdminLogin />} />
         
@@ -27,6 +29,7 @@ function App() {
         
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </ToastProvider>
     </BrowserRouter>
   )
 }
