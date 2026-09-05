@@ -50,7 +50,7 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 to={link.path}
-                className={`font-medium text-sm tracking-wide transition-colors duration-200 hover:text-dorn ${location.pathname === link.path ? 'text-dorn font-semibold' : ''}`}
+                className={`font-medium text-sm tracking-wide transition-all duration-200 ${location.pathname === link.path ? 'text-white underline decoration-dorn decoration-2 underline-offset-8 font-semibold' : 'text-white/90 hover:text-white hover:underline hover:decoration-dorn hover:decoration-2 hover:underline-offset-8'}`}
               >
                 {link.name}
               </Link>
