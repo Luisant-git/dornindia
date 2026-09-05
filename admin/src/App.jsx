@@ -7,6 +7,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminTherapists from './pages/AdminTherapists'
 import AdminClasses from './pages/AdminClasses'
 import AdminTutorials from './pages/AdminTutorials'
+import AdminFeedback from './pages/AdminFeedback'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/therapists" element={<AdminTherapists />} />
             <Route path="/classes" element={<AdminClasses />} />
             <Route path="/tutorials" element={<AdminTutorials />} />
+            <Route path="/feedback" element={<AdminFeedback />} />
           </Route>
         </Route>
         

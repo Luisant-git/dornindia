@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, BookOpen, Video, LogOut, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, Video, MessageSquare, LogOut, Globe } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -16,6 +16,7 @@ const Sidebar = () => {
     { name: 'Therapists Master', path: '/therapists', icon: <Users size={20} /> },
     { name: 'Classes Master', path: '/classes', icon: <BookOpen size={20} /> },
     { name: 'Tutorials Master', path: '/tutorials', icon: <Video size={20} /> },
+    { name: 'Feedback Master', path: '/feedback', icon: <MessageSquare size={20} /> },
   ];
 
   return (

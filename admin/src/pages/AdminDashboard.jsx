@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Users, BookOpen, MessageSquare, Video } from 'lucide-react';
 // Importing mock data from the frontend app folder
 import { instructors, advancedTherapists, generalTherapists } from '../../../frontend/src/data/therapistsData';
@@ -18,20 +19,21 @@ const AdminDashboard = () => {
     const storedTherapists = JSON.parse(localStorage.getItem('admin_therapists')) || [...instructors, ...advancedTherapists, ...generalTherapists];
     const storedClasses = JSON.parse(localStorage.getItem('admin_classes')) || classes;
     const storedTutorials = JSON.parse(localStorage.getItem('admin_tutorials')) || tutorials;
+    const storedFeedbacks = JSON.parse(localStorage.getItem('admin_feedbacks')) || testimonials;
 
     setStats({
       therapists: storedTherapists.length,
       classes: storedClasses.length,
-      testimonials: testimonials.length,
+      testimonials: storedFeedbacks.length,
       tutorials: storedTutorials.length
     });
   }, []);
 
   const statCards = [
-    { title: 'Total Therapists', value: stats.therapists, icon: <Users size={24} className="text-blue-500" />, bg: 'bg-blue-50' },
-    { title: 'Training Classes', value: stats.classes, icon: <BookOpen size={24} className="text-green-500" />, bg: 'bg-green-50' },
-    { title: 'Testimonials', value: stats.testimonials, icon: <MessageSquare size={24} className="text-purple-500" />, bg: 'bg-purple-50' },
-    { title: 'Video Tutorials', value: stats.tutorials, icon: <Video size={24} className="text-orange-500" />, bg: 'bg-orange-50' },
+    { title: 'Therapists Master', path: '/therapists', value: stats.therapists, icon: <Users size={24} className="text-blue-500" />, bg: 'bg-blue-50' },
+    { title: 'Classes Master', path: '/classes', value: stats.classes, icon: <BookOpen size={24} className="text-green-500" />, bg: 'bg-green-50' },
+    { title: 'Tutorials Master', path: '/tutorials', value: stats.tutorials, icon: <Video size={24} className="text-orange-500" />, bg: 'bg-orange-50' },
+    { title: 'Feedback Master', path: '/feedback', value: stats.testimonials, icon: <MessageSquare size={24} className="text-purple-500" />, bg: 'bg-purple-50' },
   ];
 
   return (
@@ -45,7 +47,7 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {statCards.map((card, index) => (
-          <div key={index} className="group relative bg-white p-6 rounded-2xl shadow-md border border-neutral-100 flex flex-col justify-between hover:shadow-xl hover:shadow-[#00a3e0]/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+          <Link key={index} to={card.path} className="group relative bg-white p-6 rounded-2xl shadow-md border border-neutral-100 flex flex-col justify-between hover:shadow-xl hover:shadow-[#00a3e0]/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
             <div className="flex items-center justify-between mb-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${card.bg} shadow-inner`}>
                 {card.icon}
@@ -55,7 +57,7 @@ const AdminDashboard = () => {
               <h3 className="text-3xl font-heading font-bold text-navy mb-1 group-hover:text-[#00a3e0] transition-colors">{card.value}</h3>
               <p className="text-neutral-500 text-sm font-medium">{card.title}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

@@ -14,12 +14,9 @@ const AdminTutorials = () => {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
-    uploadDate: '',
-    duration: '',
     description: '',
     thumbnail: null,
-    videoUrl: '',
-    video: null
+    videoUrl: ''
   });
 
   useEffect(() => {
@@ -44,16 +41,13 @@ const AdminTutorials = () => {
       setFormData({
         title: tut.title || '',
         category: tut.category || '',
-        uploadDate: tut.uploadDate || '',
-        duration: tut.duration || '',
         description: tut.description || '',
         thumbnail: tut.thumbnail || null,
-        videoUrl: tut.videoUrl || '',
-        video: null
+        videoUrl: tut.videoUrl || ''
       });
     } else {
       setEditingId(null);
-      setFormData({ title: '', category: '', uploadDate: '', duration: '', description: '', thumbnail: null, videoUrl: '', video: null });
+      setFormData({ title: '', category: '', description: '', thumbnail: null, videoUrl: '' });
     }
     setIsModalOpen(true);
   };
@@ -63,42 +57,6 @@ const AdminTutorials = () => {
       const updated = tutorialsList.filter(t => t.id !== id);
       saveToStorage(updated);
     }
-  };
-
-  const formatDuration = (seconds) => {
-    if (!seconds || isNaN(seconds)) return '';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.round(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const handleVideoUpload = (file) => {
-    if (!file) return;
-    const objectUrl = URL.createObjectURL(file);
-    const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.src = objectUrl;
-    video.onloadedmetadata = () => {
-      const duration = formatDuration(video.duration);
-      const today = new Date().toISOString().slice(0, 10);
-      setFormData(prev => ({
-        ...prev,
-        video: objectUrl,
-        videoUrl: objectUrl,
-        duration: duration || prev.duration,
-        uploadDate: prev.uploadDate || today
-      }));
-      URL.revokeObjectURL(objectUrl);
-    };
-    video.onerror = () => {
-      const today = new Date().toISOString().slice(0, 10);
-      setFormData(prev => ({
-        ...prev,
-        video: objectUrl,
-        videoUrl: objectUrl,
-        uploadDate: prev.uploadDate || today
-      }));
-    };
   };
 
   const handleSubmit = (e) => {
@@ -167,8 +125,7 @@ const AdminTutorials = () => {
               <tr className="bg-neutral-50/50 text-neutral-500 text-xs uppercase tracking-wider font-semibold border-b border-neutral-100">
                 <th className="p-4 font-medium">Title</th>
                 <th className="p-4 font-medium">Category</th>
-                <th className="p-4 font-medium">Date</th>
-                <th className="p-4 font-medium">Duration</th>
+                <th className="p-4 font-medium">Description</th>
                 <th className="p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
@@ -188,8 +145,9 @@ const AdminTutorials = () => {
                       {t.category}
                     </span>
                   </td>
-                  <td className="p-4 text-sm text-neutral-600 font-medium">{t.uploadDate || '-'}</td>
-                  <td className="p-4 text-sm text-neutral-600">{t.duration || '-'}</td>
+                  <td className="p-4 text-sm text-neutral-600 max-w-xs truncate" title={t.description}>
+                    {t.description || '-'}
+                  </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2 transition-opacity">
                       <button onClick={() => handleOpenModal(t, true)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-emerald-100" title="View">
@@ -262,8 +220,6 @@ const AdminTutorials = () => {
                     <div className="space-y-4">
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Title:</strong> {formData.title || '-'}</div>
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Category:</strong> {formData.category || '-'}</div>
-                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Upload Date:</strong> {formData.uploadDate || '-'}</div>
-                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Duration:</strong> {formData.duration || '-'}</div>
                       {formData.videoUrl && (
                         <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Video URL:</strong> {formData.videoUrl}</div>
                       )}
@@ -307,36 +263,6 @@ const AdminTutorials = () => {
                     </div>
                     
                     <div className="md:col-span-2">
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Video File <span className="text-red-500">*</span></label>
-                      <label className={`group relative flex flex-col items-center justify-center w-full overflow-hidden rounded-xl border-2 border-dashed transition-all cursor-pointer ${formData.video ? 'border-[#00a3e0]/40 bg-[#00a3e0]/5' : 'border-neutral-200 bg-neutral-50/50 hover:border-[#00a3e0]/50 hover:bg-[#00a3e0]/5'}`}>
-                        <input type="file" accept="video/*" className="hidden" onChange={e => handleVideoUpload(e.target.files[0] ? e.target.files[0] : null)} />
-                        {formData.video ? (
-                          <>
-                            <video src={formData.video} className="w-full max-h-64 object-contain bg-black/5" controls />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/90 text-neutral-700 text-sm font-semibold">
-                                <Upload size={16} /> Change video
-                              </span>
-                            </div>
-                            <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFormData({...formData, video: null, videoUrl: '', duration: '', uploadDate: ''}); }} className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-red-600 hover:bg-red-50 text-xs font-medium transition-colors shadow-sm border border-neutral-200">
-                              <Trash2 size={13} /> Remove
-                            </button>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-sm border border-neutral-200">
-                              <Upload size={20} className="text-[#00a3e0]" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-neutral-700">Click to upload video</p>
-                              <p className="text-xs text-neutral-400 mt-1">MP4 · Duration & date auto-filled</p>
-                            </div>
-                          </div>
-                        )}
-                      </label>
-                    </div>
-                    
-                    <div className="md:col-span-2">
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Title <span className="text-red-500">*</span></label>
                       <input required type="text" placeholder="Tutorial title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
@@ -346,21 +272,11 @@ const AdminTutorials = () => {
                       <input required type="text" placeholder="e.g., Overview, Self-Care" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
                     
-                    <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Upload Date <span className="text-red-500">*</span></label>
-                      <input required type="date" value={formData.uploadDate} onChange={e => setFormData({...formData, uploadDate: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Duration <span className="text-red-500">*</span></label>
-                      <input required type="text" placeholder="e.g., 15:30" value={formData.duration} readOnly disabled onChange={e => setFormData({...formData, duration: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-neutral-100 text-neutral-500 placeholder:text-gray-400 cursor-not-allowed" />
-                    </div>
-                    
                     <div className="md:col-span-2">
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Video URL</label>
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Video URL <span className="text-red-500">*</span></label>
                       <div className="relative">
                         <Link2 size={16} className="absolute left-3.5 top-3 text-neutral-400" />
-                        <input type="text" placeholder="https://www.youtube.com/watch?v=..." value={formData.videoUrl} readOnly onChange={e => setFormData({...formData, videoUrl: e.target.value})} className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-neutral-100 text-neutral-500 placeholder:text-gray-400" />
+                        <input required type="text" placeholder="https://www.youtube.com/watch?v=..." value={formData.videoUrl} onChange={e => setFormData({...formData, videoUrl: e.target.value})} className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                       </div>
                     </div>
                     

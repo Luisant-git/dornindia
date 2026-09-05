@@ -229,31 +229,32 @@ const AdminTherapists = () => {
                     
                     <div className="md:col-span-2">
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Profile Image</label>
-                      <div className="flex flex-col sm:flex-row items-center gap-6 w-full p-6 bg-neutral-50/60 border border-neutral-200 rounded-xl">
-                        <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 bg-white border border-neutral-200 shadow-sm flex items-center justify-center">
-                          {formData.profile ? (
-                            <img src={formData.profile} alt="Profile preview" className="w-full h-full object-cover" />
-                          ) : (
-                            <User size={52} className="text-neutral-300" />
-                          )}
+                      <input type="file" id="therapist-profile-input" accept="image/*" className="hidden" onChange={e => setFormData({...formData, profile: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null})} />
+                      {formData.profile ? (
+                        <div className="flex flex-col items-center justify-center gap-3 py-6">
+                          <label htmlFor="therapist-profile-input" className="cursor-pointer group relative">
+                            <div className="w-32 h-32 rounded-full overflow-hidden shadow-lg ring-4 ring-neutral-100 border border-neutral-200">
+                              <img src={formData.profile} alt="Profile preview" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-neutral-700 text-xs font-semibold">
+                                <Upload size={14} /> Change
+                              </span>
+                            </div>
+                          </label>
+                          <button type="button" onClick={() => setFormData({...formData, profile: null})} className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 hover:underline text-sm font-medium transition-colors">
+                            <Trash2 size={15} /> Remove photo
+                          </button>
                         </div>
-                        <div className="flex flex-col items-center sm:items-start gap-3 flex-grow text-center sm:text-left">
-                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                            <label className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#00a3e0] hover:bg-[#0082b3] text-white text-sm font-semibold cursor-pointer transition-colors shadow-sm">
-                              <Upload size={16} />
-                              Upload Photo
-                              <input type="file" accept="image/*" className="hidden" onChange={e => setFormData({...formData, profile: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null})} />
-                            </label>
-                            {formData.profile && (
-                              <button type="button" onClick={() => setFormData({...formData, profile: null})} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-neutral-200 bg-white text-neutral-500 hover:text-red-600 hover:border-red-200 text-sm font-medium transition-colors">
-                                <Trash2 size={15} />
-                                Remove
-                              </button>
-                            )}
+                      ) : (
+                        <label htmlFor="therapist-profile-input" className="group relative flex flex-col items-center justify-center w-full py-10 px-6 overflow-hidden rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50/60 hover:border-[#00a3e0]/60 hover:bg-[#00a3e0]/5 transition-all cursor-pointer text-center">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-sm border border-neutral-200 mb-3 group-hover:border-[#00a3e0]/40 group-hover:shadow-[#00a3e0]/10 transition-all">
+                            <Upload size={22} className="text-[#00a3e0]" />
                           </div>
-                          <span className="text-xs text-neutral-400">JPG or PNG</span>
-                        </div>
-                      </div>
+                          <p className="text-sm font-semibold text-neutral-700">Upload profile image</p>
+                          <p className="text-xs text-neutral-400 mt-1">JPG or PNG, max 2MB</p>
+                        </label>
+                      )}
                     </div>
                     
                     <div>
