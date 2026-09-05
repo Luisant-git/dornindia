@@ -6,22 +6,22 @@ const DornMethodIndia = () => {
     {
       icon: <Globe size={28} className="text-dorn" />,
       title: "Accessibility",
-      description: "The DORN Method and especially its Selfhelp possibilities should be known and freely available to everybody who wants to learn it."
+      description: "We believe the DORN Method's self-help techniques should be universally accessible and available to anyone eager to learn."
     },
     {
       icon: <ShieldCheck size={28} className="text-dorn" />,
-      title: "Verifiable Information",
-      description: "To present verifiable information in order to avoid or correct possible misconceptions about DORN."
+      title: "Accurate Knowledge",
+      description: "Our goal is to provide evidence-based, factual information to clear up any misunderstandings surrounding the DORN approach."
     },
     {
       icon: <Puzzle size={28} className="text-dorn" />,
-      title: "Integration",
-      description: "To integrate DORN into conventional and complementary medicine for a better health benefit of mankind."
+      title: "Holistic Integration",
+      description: "We aim to seamlessly blend DORN practices with both traditional and alternative medicine, enhancing global health and well-being."
     },
     {
       icon: <Map size={28} className="text-dorn" />,
-      title: "The Bigger Picture",
-      description: "To have DORN Centers in many countries where students can learn DORN for selfhelp or therapeutic purposes."
+      title: "Global Vision",
+      description: "Our ultimate vision is to establish dedicated DORN training centers worldwide, empowering individuals to master the method for personal care or professional therapy."
     }
   ];
 
@@ -39,10 +39,10 @@ const DornMethodIndia = () => {
             OUR MISSION
           </span>
           <h2 className="text-4xl md:text-5xl font-heading font-bold text-neutral-900 mb-6">
-            Dorn India Platform
+            The Dorn India Platform
           </h2>
           <p className="text-neutral-600 text-lg md:text-xl font-light leading-relaxed">
-            Our platform serves as the central hub for the DORN Method in India. We are dedicated to spreading awareness, providing high-quality education, and building a community of skilled practitioners.
+            As the premier hub for the DORN Method in India, we are passionate about spreading awareness, delivering top-tier education, and cultivating a supportive network of highly skilled holistic practitioners.
           </p>
         </div>
         
