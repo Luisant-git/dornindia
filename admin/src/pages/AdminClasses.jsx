@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload } from 'lucide-react';
 import { classes as initialClasses } from '../../../frontend/src/data/classes';
 
 const AdminClasses = () => {
   const [classesList, setClassesList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,9 +14,11 @@ const AdminClasses = () => {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
-    date: '',
+    startDate: '',
+    endDate: '',
     duration: '',
-    description: ''
+    description: '',
+    image: null
   });
 
   useEffect(() => {
@@ -40,13 +43,15 @@ const AdminClasses = () => {
       setFormData({
         title: cls.title || '',
         category: cls.category || '',
-        date: cls.date || '',
+        startDate: cls.startDate || '',
+        endDate: cls.endDate || '',
         duration: cls.duration || '',
-        description: cls.description || ''
+        description: cls.description || '',
+        image: cls.image || null
       });
     } else {
       setEditingId(null);
-      setFormData({ title: '', category: '', date: '', duration: '', description: '' });
+      setFormData({ title: '', category: '', startDate: '', endDate: '', duration: '', description: '', image: null });
     }
     setIsModalOpen(true);
   };
@@ -60,18 +65,32 @@ const AdminClasses = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const dateLabel = formData.startDate || formData.endDate
+      ? (formData.startDate || '') + (formData.startDate && formData.endDate ? ' - ' + formData.endDate : '')
+      : '';
+    const payload = { ...formData, date: dateLabel };
     if (editingId) {
-      const updated = classesList.map(c => c.id === editingId ? { ...c, ...formData } : c);
+      const updated = classesList.map(c => c.id === editingId ? { ...c, ...payload } : c);
       saveToStorage(updated);
     } else {
       const newClass = {
         id: `c-${Date.now()}`,
-        ...formData
+        ...payload
       };
       saveToStorage([newClass, ...classesList]);
     }
     setIsModalOpen(false);
   };
+
+  const filteredClasses = classesList.filter(c => 
+    c.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
+  const paginatedClasses = filteredClasses.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -90,9 +109,22 @@ const AdminClasses = () => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/60 overflow-hidden">
-        <div className="p-5 border-b border-neutral-100 flex justify-end items-center bg-neutral-50/30">
+        <div className="p-5 border-b border-neutral-100 flex justify-between items-center bg-neutral-50/30">
+          <div className="relative w-72">
+            <input 
+              type="text" 
+              placeholder="Search classes..." 
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
+            />
+            <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+          </div>
           <div className="text-sm font-medium text-neutral-500 bg-white px-4 py-2 rounded-lg border border-neutral-200 shadow-sm">
-            Total: <span className="text-navy font-bold">{classesList.length}</span>
+            Total: <span className="text-navy font-bold">{filteredClasses.length}</span>
           </div>
         </div>
         <div className="overflow-x-auto custom-scrollbar">
@@ -101,27 +133,31 @@ const AdminClasses = () => {
               <tr className="bg-neutral-50/50 text-neutral-500 text-xs uppercase tracking-wider font-semibold border-b border-neutral-100">
                 <th className="p-4 font-medium">Class Title</th>
                 <th className="p-4 font-medium">Category</th>
-                <th className="p-4 font-medium">Date & Duration</th>
-                <th className="p-4 font-medium">Description</th>
+                <th className="p-4 font-medium">Start Date</th>
+                <th className="p-4 font-medium">End Date</th>
+                <th className="p-4 font-medium">Days</th>
                 <th className="p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100/60">
-              {classesList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(c => (
+              {paginatedClasses.map(c => (
                 <tr key={c.id} className="hover:bg-neutral-50/80 transition-colors group">
-                  <td className="p-4 font-semibold text-navy">{c.title}</td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      {c.image && (
+                        <img src={c.image} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-neutral-200" />
+                      )}
+                      <div className="font-semibold text-navy">{c.title}</div>
+                    </div>
+                  </td>
                   <td className="p-4">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-neutral-100 text-neutral-700 shadow-sm border border-neutral-200/50">
                       {c.category}
                     </span>
                   </td>
-                  <td className="p-4 text-sm text-neutral-600">
-                    <div className="font-medium">{c.date}</div>
-                    <div className="text-xs text-neutral-400 mt-0.5 flex items-center"><div className="w-1.5 h-1.5 rounded-full bg-[#00a3e0]/50 mr-1.5"></div>{c.duration}</div>
-                  </td>
-                  <td className="p-4 text-sm text-neutral-600 max-w-xs truncate" title={c.description}>
-                    {c.description}
-                  </td>
+                  <td className="p-4 text-sm text-neutral-600 font-medium">{c.startDate || '-'}</td>
+                  <td className="p-4 text-sm text-neutral-600">{c.endDate || '-'}</td>
+                  <td className="p-4 text-sm text-neutral-600">{c.duration}</td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2 transition-opacity">
                       <button onClick={() => handleOpenModal(c, true)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-emerald-100" title="View">
@@ -139,16 +175,16 @@ const AdminClasses = () => {
               ))}
             </tbody>
           </table>
-          {classesList.length === 0 && (
+          {filteredClasses.length === 0 && (
             <div className="p-8 text-center text-neutral-500">No classes found.</div>
           )}
         </div>
 
         {/* Pagination */}
-        {Math.ceil(classesList.length / itemsPerPage) > 1 && (
+        {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/30 flex items-center justify-between">
             <span className="text-sm text-neutral-500">
-              Showing <span className="font-medium text-navy">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-navy">{Math.min(currentPage * itemsPerPage, classesList.length)}</span> of <span className="font-medium text-navy">{classesList.length}</span> results
+              Showing <span className="font-medium text-navy">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-navy">{Math.min(currentPage * itemsPerPage, filteredClasses.length)}</span> of <span className="font-medium text-navy">{filteredClasses.length}</span> results
             </span>
             <div className="flex gap-2">
               <button 
@@ -159,8 +195,8 @@ const AdminClasses = () => {
                 <ChevronLeft size={18} />
               </button>
               <button 
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(classesList.length / itemsPerPage)))}
-                disabled={currentPage === Math.ceil(classesList.length / itemsPerPage)}
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
                 className="p-2 rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
               >
                 <ChevronRight size={18} />
@@ -185,18 +221,56 @@ const AdminClasses = () => {
               {/* Body */}
               <div className="px-8 pb-4 overflow-y-auto custom-scrollbar flex-1 bg-white">
                 {isViewMode ? (
-                  <div className="space-y-4 pt-2">
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Class Title:</strong> {formData.title || '-'}</div>
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Category:</strong> {formData.category || '-'}</div>
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Date:</strong> {formData.date || '-'}</div>
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Duration:</strong> {formData.duration || '-'}</div>
-                    <div>
-                      <strong className="text-black font-bold block mb-1">Description:</strong>
-                      <div className="text-[15px] text-neutral-800 whitespace-pre-wrap leading-relaxed">{formData.description || '-'}</div>
+                  <div className="pt-2">
+                    {formData.image && (
+                      <div className="mb-5 overflow-hidden -mx-8">
+                        <img src={formData.image} alt="Class preview" className="w-full h-48 object-contain" />
+                      </div>
+                    )}
+                    <div className="space-y-4">
+                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Class Title:</strong> {formData.title || '-'}</div>
+                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Category:</strong> {formData.category || '-'}</div>
+                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Start Date:</strong> {formData.startDate || '-'}</div>
+                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">End Date:</strong> {formData.endDate || '-'}</div>
+                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Days:</strong> {formData.duration || '-'}</div>
+                      <div>
+                        <strong className="text-black font-bold block mb-1">Description:</strong>
+                        <div className="text-[15px] text-neutral-800 whitespace-pre-wrap leading-relaxed">{formData.description || '-'}</div>
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Class Image</label>
+                      <label className={`group relative flex flex-col items-center justify-center w-full overflow-hidden rounded-xl border-2 border-dashed transition-all cursor-pointer ${formData.image ? 'border-[#00a3e0]/40 bg-[#00a3e0]/5' : 'border-neutral-200 bg-neutral-50/50 hover:border-[#00a3e0]/50 hover:bg-[#00a3e0]/5'}`}>
+                        <input type="file" accept="image/*" className="hidden" onChange={e => setFormData({...formData, image: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null})} />
+                        {formData.image ? (
+                          <>
+                            <img src={formData.image} alt="Class preview" className="w-full max-h-64 object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/90 text-neutral-700 text-sm font-semibold">
+                                <Upload size={16} /> Change image
+                              </span>
+                            </div>
+                            <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFormData({...formData, image: null}); }} className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-red-600 hover:bg-red-50 text-xs font-medium transition-colors shadow-sm border border-neutral-200">
+                              <Trash2 size={13} /> Remove
+                            </button>
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-sm border border-neutral-200">
+                              <Upload size={20} className="text-[#00a3e0]" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-neutral-700">Click to upload class image</p>
+                              <p className="text-xs text-neutral-400 mt-1">JPG or PNG · Recommended 800 x 400</p>
+                            </div>
+                          </div>
+                        )}
+                      </label>
+                    </div>
                     
                     <div className="md:col-span-2">
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Class Title <span className="text-red-500">*</span></label>
@@ -209,13 +283,18 @@ const AdminClasses = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Date <span className="text-red-500">*</span></label>
-                      <input required type="text" placeholder="e.g., Oct 15 - 17, 2024" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Start Date <span className="text-red-500">*</span></label>
+                      <input required type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
                     </div>
                     
                     <div>
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Duration <span className="text-red-500">*</span></label>
-                      <input required type="text" placeholder="e.g., 3 Days" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">End Date <span className="text-red-500">*</span></label>
+                      <input required type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Days <span className="text-red-500">*</span></label>
+                      <input required type="number" min="1" placeholder="e.g., 3" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
                     
                     <div className="md:col-span-2">
