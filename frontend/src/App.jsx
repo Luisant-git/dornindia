@@ -10,6 +10,7 @@ import Trainings from './pages/Trainings';
 import Tutorials from './pages/Tutorials';
 import Contact from './pages/Contact';
 import LearningDorn from './pages/LearningDorn';
+import Directory from './pages/Directory';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/trainings" element={<Trainings />} />
           <Route path="/tutorials" element={<Tutorials />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/directory" element={<Directory />} />
         </Routes>
       </main>
       <Footer />
