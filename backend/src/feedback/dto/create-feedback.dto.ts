@@ -5,17 +5,27 @@ export class CreateFeedbackDto {
   @ApiProperty({ example: 'Jane Doe' })
   @IsString()
   @IsNotEmpty()
-  author: string;
+  name: string;
 
-  @ApiProperty({ example: 'Great class!' })
+  @ApiProperty({ example: 'Physiotherapist', required: false })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  content: string;
+  profession?: string;
 
-  @ApiProperty({ example: 5, required: false })
+  @ApiProperty({ example: 5, required: false, default: 5 })
   @IsOptional()
   @IsNumber()
   rating?: number;
+
+  @ApiProperty({ example: 'Great class!', required: false })
+  @IsOptional()
+  @IsString()
+  feedback?: string;
+
+  @ApiProperty({ example: 'path/to/image.jpg', required: false })
+  @IsOptional()
+  @IsString()
+  image?: string;
 
   @ApiProperty({ example: true, required: false, default: true })
   @IsOptional()

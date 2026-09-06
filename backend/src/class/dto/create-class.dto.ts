@@ -7,25 +7,35 @@ export class CreateClassDto {
   @IsNotEmpty()
   title: string;
 
+  @ApiProperty({ example: 'Seminar', required: false })
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiProperty({ example: '2025-01-15', required: false })
+  @IsOptional()
+  @IsString()
+  startDate?: string;
+
+  @ApiProperty({ example: '2025-01-18', required: false })
+  @IsOptional()
+  @IsString()
+  endDate?: string;
+
+  @ApiProperty({ example: '3', required: false })
+  @IsOptional()
+  @IsString()
+  duration?: string;
+
   @ApiProperty({ example: 'Learn the basics of Yoga.', required: false })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: '10:00 AM', required: false })
+  @ApiProperty({ example: 'path/to/image.jpg', required: false })
   @IsOptional()
   @IsString()
-  schedule?: string;
-
-  @ApiProperty({ example: '2023-12-01', required: false })
-  @IsOptional()
-  @IsString()
-  startDate?: string;
-
-  @ApiProperty({ example: 'John Doe', required: false })
-  @IsOptional()
-  @IsString()
-  instructor?: string;
+  image?: string;
 
   @ApiProperty({ example: true, required: false, default: true })
   @IsOptional()

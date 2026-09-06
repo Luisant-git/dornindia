@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query, Patch } from '@nestjs/common';
 import { ClassService } from './class.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateClassDto } from './dto/create-class.dto';
@@ -15,13 +15,18 @@ export class ClassController {
   }
 
   @Get()
-  findAll() {
-    return this.classService.findAll();
+  findAll(@Query() query: any) {
+    return this.classService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.classService.findOne(+id);
+  }
+
+  @Patch(':id/toggle')
+  toggleActive(@Param('id') id: string) {
+    return this.classService.toggleActive(+id);
   }
 
   @Put(':id')

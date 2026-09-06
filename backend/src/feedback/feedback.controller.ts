@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query, Patch } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -15,13 +15,18 @@ export class FeedbackController {
   }
 
   @Get()
-  findAll() {
-    return this.feedbackService.findAll();
+  findAll(@Query() query: any) {
+    return this.feedbackService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.feedbackService.findOne(+id);
+  }
+
+  @Patch(':id/toggle')
+  toggleActive(@Param('id') id: string) {
+    return this.feedbackService.toggleActive(+id);
   }
 
   @Put(':id')

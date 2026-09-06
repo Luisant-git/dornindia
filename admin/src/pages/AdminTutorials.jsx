@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, Link2 } from 'lucide-react';
+import { Plus, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, X, Link2 } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { tutorialsApi } from '../api/tutorialsApi';
+import config from '../config.js';
 
 const AdminTutorials = () => {
   const toast = useToast();
@@ -13,11 +14,13 @@ const AdminTutorials = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
     description: '',
     thumbnail: null,
+    thumbnailFile: null,
     videoUrl: ''
   });
 
@@ -25,7 +28,7 @@ const AdminTutorials = () => {
     const fetchTutorials = async () => {
       try {
         const data = await tutorialsApi.getAll();
-        setTutorialsList(data);
+        setTutorialsList(Array.isArray(data) ? data : data.items || []);
       } catch (error) {
         console.error('Failed to fetch tutorials:', error);
         setTutorialsList([]);
@@ -33,11 +36,6 @@ const AdminTutorials = () => {
     };
     fetchTutorials();
   }, []);
-
-  const saveToStorage = (data) => {
-    setTutorialsList(data);
-    localStorage.setItem('admin_tutorials', JSON.stringify(data));
-  };
 
   const handleOpenModal = (tut = null, viewMode = false) => {
     setIsViewMode(viewMode);
@@ -48,43 +46,86 @@ const AdminTutorials = () => {
         category: tut.category || '',
         description: tut.description || '',
         thumbnail: tut.thumbnail || null,
+        thumbnailFile: null,
         videoUrl: tut.videoUrl || ''
       });
     } else {
       setEditingId(null);
-      setFormData({ title: '', category: '', description: '', thumbnail: null, videoUrl: '' });
+      setFormData({ title: '', category: '', description: '', thumbnail: null, thumbnailFile: null, videoUrl: '' });
     }
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this tutorial?')) {
-      const updated = tutorialsList.filter(t => t.id !== id);
-      saveToStorage(updated);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await tutorialsApi.delete(deleteId);
+      setTutorialsList(prev => prev.filter(t => t.id !== deleteId));
       toast.success('Tutorial deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete tutorial:', error);
+      toast.error('Failed to delete tutorial');
     }
+    setDeleteId(null);
   };
 
-  const handleSubmit = (e) => {
+  const uploadImage = async (file) => {
+    const body = new FormData();
+    body.append('image', file);
+    const response = await fetch(`${config.API_BASE_URL}/upload`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
+      body
+    });
+    if (!response.ok) throw new Error('Failed to upload image');
+    const { url } = await response.json();
+    return url;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingId) {
-      const updated = tutorialsList.map(t => t.id === editingId ? { ...t, ...formData } : t);
-      saveToStorage(updated);
-      toast.success('Tutorial updated successfully');
-    } else {
-      const newTutorial = {
-        id: `t-${Date.now()}`,
-        ...formData
+    try {
+      let thumbnailUrl = formData.thumbnail;
+      if (formData.thumbnailFile) {
+        thumbnailUrl = await uploadImage(formData.thumbnailFile);
+      }
+      const payload = {
+        title: formData.title,
+        category: formData.category,
+        description: formData.description,
+        videoUrl: formData.videoUrl,
+        thumbnail: thumbnailUrl
       };
-      saveToStorage([newTutorial, ...tutorialsList]);
-      toast.success('Tutorial added successfully');
+      if (editingId) {
+        const updated = await tutorialsApi.update(editingId, payload);
+        setTutorialsList(prev => prev.map(t => t.id === editingId ? updated : t));
+        toast.success('Tutorial updated successfully');
+      } else {
+        const created = await tutorialsApi.create(payload);
+        setTutorialsList(prev => [created, ...prev]);
+        toast.success('Tutorial added successfully');
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Failed to save tutorial:', error);
+      toast.error('Failed to save tutorial');
     }
-    setIsModalOpen(false);
   };
 
-  const filteredTutorials = tutorialsList.filter(t =>
-    t.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const hasActiveFilters = searchTerm;
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  const filteredTutorials = tutorialsList.filter(t => {
+    const term = searchTerm.toLowerCase();
+    return !searchTerm ||
+      (t.title || '').toLowerCase().includes(term) ||
+      (t.category || '').toLowerCase().includes(term) ||
+      (t.description || '').toLowerCase().includes(term);
+  });
 
   const totalPages = Math.ceil(filteredTutorials.length / itemsPerPage);
   const paginatedTutorials = filteredTutorials.slice(
@@ -110,18 +151,25 @@ const AdminTutorials = () => {
 
       <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/60 overflow-hidden">
         <div className="p-4 md:p-5 border-b border-neutral-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-neutral-50/30">
-          <div className="relative w-full sm:w-72">
-            <input 
-              type="text" 
-              placeholder="Search tutorials..." 
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
-            />
-            <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-72">
+              <input 
+                type="text" 
+                placeholder="Search by title, category..." 
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
+              />
+              <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+            </div>
+            {hasActiveFilters && (
+              <button onClick={clearAllFilters} className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium border border-red-200">
+                <X size={14} /> Clear
+              </button>
+            )}
           </div>
           <div className="text-sm font-medium text-neutral-500 bg-white px-4 py-2 rounded-lg border border-neutral-200 shadow-sm self-start sm:self-auto">
             Total: <span className="text-navy font-bold">{filteredTutorials.length}</span>
@@ -131,6 +179,7 @@ const AdminTutorials = () => {
           <table className="w-full text-left border-collapse whitespace-nowrap">
             <thead>
               <tr className="bg-neutral-50/50 text-neutral-500 text-xs uppercase tracking-wider font-semibold border-b border-neutral-100">
+                <th className="p-4 font-medium">S.No</th>
                 <th className="p-4 font-medium">Title</th>
                 <th className="p-4 font-medium">Category</th>
                 <th className="p-4 font-medium">Description</th>
@@ -138,8 +187,9 @@ const AdminTutorials = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100/60">
-              {paginatedTutorials.map(t => (
+              {paginatedTutorials.map((t, idx) => (
                 <tr key={t.id} className="hover:bg-neutral-50/80 transition-colors group">
+                  <td className="p-4 text-sm text-neutral-600">{(currentPage - 1) * itemsPerPage + idx + 1}</td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       {t.thumbnail && (
@@ -164,7 +214,7 @@ const AdminTutorials = () => {
                       <button onClick={() => handleOpenModal(t, false)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-blue-100" title="Edit">
                         <SquarePen size={16} />
                       </button>
-                      <button onClick={() => handleDelete(t.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-red-100" title="Delete">
+                      <button onClick={() => setDeleteId(t.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-red-100" title="Delete">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -242,32 +292,30 @@ const AdminTutorials = () => {
                     
                     <div className="md:col-span-2">
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Thumbnail Image</label>
-                      <label className={`group relative flex flex-col items-center justify-center w-full overflow-hidden rounded-xl border-2 border-dashed transition-all cursor-pointer ${formData.thumbnail ? 'border-[#00a3e0]/40 bg-[#00a3e0]/5' : 'border-neutral-200 bg-neutral-50/50 hover:border-[#00a3e0]/50 hover:bg-[#00a3e0]/5'}`}>
-                        <input type="file" accept="image/*" className="hidden" onChange={e => setFormData({...formData, thumbnail: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null})} />
-                        {formData.thumbnail ? (
-                          <>
+                      <input type="file" id="tutorial-thumb-input" accept="image/*" className="hidden" onChange={e => { const file = e.target.files[0]; setFormData({...formData, thumbnailFile: file || null, thumbnail: file ? URL.createObjectURL(file) : null}); }} />
+                      {formData.thumbnail ? (
+                        <div className="flex flex-col items-center justify-center gap-3 py-6">
+                          <label htmlFor="tutorial-thumb-input" className="cursor-pointer group relative overflow-hidden rounded-xl border border-neutral-200 w-full max-h-64">
                             <img src={formData.thumbnail} alt="Thumbnail preview" className="w-full max-h-64 object-cover" />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/90 text-neutral-700 text-sm font-semibold">
                                 <Upload size={16} /> Change image
                               </span>
                             </div>
-                            <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFormData({...formData, thumbnail: null}); }} className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-red-600 hover:bg-red-50 text-xs font-medium transition-colors shadow-sm border border-neutral-200">
-                              <Trash2 size={13} /> Remove
-                            </button>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-sm border border-neutral-200">
-                              <Upload size={20} className="text-[#00a3e0]" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-neutral-700">Click to upload thumbnail</p>
-                              <p className="text-xs text-neutral-400 mt-1">JPG or PNG · Recommended 800 x 400</p>
-                            </div>
+                          </label>
+                          <button type="button" onClick={() => setFormData({...formData, thumbnail: null, thumbnailFile: null})} className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 hover:underline text-sm font-medium transition-colors">
+                            <Trash2 size={15} /> Remove image
+                          </button>
+                        </div>
+                      ) : (
+                        <label htmlFor="tutorial-thumb-input" className="group relative flex flex-col items-center justify-center w-full py-10 px-6 overflow-hidden rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50/60 hover:border-[#00a3e0]/60 hover:bg-[#00a3e0]/5 transition-all cursor-pointer text-center">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-sm border border-neutral-200 mb-3 group-hover:border-[#00a3e0]/40 group-hover:shadow-[#00a3e0]/10 transition-all">
+                            <Upload size={22} className="text-[#00a3e0]" />
                           </div>
-                        )}
-                      </label>
+                          <p className="text-sm font-semibold text-neutral-700">Upload thumbnail image</p>
+                          <p className="text-xs text-neutral-400 mt-1">JPG or PNG · Recommended 800 x 400</p>
+                        </label>
+                      )}
                     </div>
                     
                     <div className="md:col-span-2">
@@ -309,6 +357,29 @@ const AdminTutorials = () => {
                 )}
               </div>
             </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {deleteId && createPortal(
+        <div className="fixed inset-0 bg-neutral-900/50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200" style={{ zIndex: 9999 }}>
+          <div className="bg-white rounded-md shadow-xl w-full max-w-sm animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="p-8 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                <Trash2 size={24} className="text-red-600" />
+              </div>
+              <h3 className="text-lg font-bold text-black mb-2">Delete Tutorial</h3>
+              <p className="text-sm text-neutral-500">Are you sure you want to delete this tutorial? This action cannot be undone.</p>
+            </div>
+            <div className="px-6 py-4 bg-neutral-50 flex items-center justify-center gap-3 border-t border-neutral-100">
+              <button onClick={() => setDeleteId(null)} className="flex-1 px-5 py-2.5 bg-[#4b5563] text-white rounded-xl text-sm hover:bg-[#374151] transition-colors font-semibold shadow-sm text-center">
+                Cancel
+              </button>
+              <button onClick={handleDelete} className="flex-1 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm transition-colors font-semibold shadow-sm text-center">
+                Delete
+              </button>
+            </div>
           </div>
         </div>,
         document.body

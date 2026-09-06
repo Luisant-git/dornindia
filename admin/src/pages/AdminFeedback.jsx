@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, Star, StarHalf, User } from 'lucide-react';
+import { Plus, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, X, Star, StarHalf } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { feedbackApi } from '../api/feedbackApi';
+import config from '../config.js';
 
 const AdminFeedback = () => {
   const toast = useToast();
@@ -13,19 +14,21 @@ const AdminFeedback = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     profession: '',
     rating: 5,
     feedback: '',
-    image: null
+    image: null,
+    imageFile: null
   });
 
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
         const data = await feedbackApi.getAll();
-        setFeedbacksList(data);
+        setFeedbacksList(Array.isArray(data) ? data : data.items || []);
       } catch (error) {
         console.error('Failed to fetch feedback:', error);
         setFeedbacksList([]);
@@ -33,11 +36,6 @@ const AdminFeedback = () => {
     };
     fetchFeedback();
   }, []);
-
-  const saveToStorage = (data) => {
-    setFeedbacksList(data);
-    localStorage.setItem('admin_feedbacks', JSON.stringify(data));
-  };
 
   const handleOpenModal = (fb = null, viewMode = false) => {
     setIsViewMode(viewMode);
@@ -48,44 +46,86 @@ const AdminFeedback = () => {
         profession: fb.profession || '',
         rating: fb.rating || 5,
         feedback: fb.feedback || '',
-        image: fb.image || null
+        image: fb.image || null,
+        imageFile: null
       });
     } else {
       setEditingId(null);
-      setFormData({ name: '', profession: '', rating: 5, feedback: '', image: null });
+      setFormData({ name: '', profession: '', rating: 5, feedback: '', image: null, imageFile: null });
     }
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this feedback?')) {
-      const updated = feedbacksList.filter(f => f.id !== id);
-      saveToStorage(updated);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await feedbackApi.delete(deleteId);
+      setFeedbacksList(prev => prev.filter(f => f.id !== deleteId));
       toast.success('Feedback deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete feedback:', error);
+      toast.error('Failed to delete feedback');
     }
+    setDeleteId(null);
   };
 
-  const handleSubmit = (e) => {
+  const uploadImage = async (file) => {
+    const body = new FormData();
+    body.append('image', file);
+    const response = await fetch(`${config.API_BASE_URL}/upload`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
+      body
+    });
+    if (!response.ok) throw new Error('Failed to upload image');
+    const { url } = await response.json();
+    return url;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingId) {
-      const updated = feedbacksList.map(f => f.id === editingId ? { ...f, ...formData } : f);
-      saveToStorage(updated);
-      toast.success('Feedback updated successfully');
-    } else {
-      const newFeedback = {
-        id: `fb-${Date.now()}`,
-        ...formData
+    try {
+      let imageUrl = formData.image;
+      if (formData.imageFile) {
+        imageUrl = await uploadImage(formData.imageFile);
+      }
+      const payload = {
+        name: formData.name,
+        profession: formData.profession,
+        rating: Number(formData.rating),
+        feedback: formData.feedback,
+        image: imageUrl
       };
-      saveToStorage([newFeedback, ...feedbacksList]);
-      toast.success('Feedback added successfully');
+      if (editingId) {
+        const updated = await feedbackApi.update(editingId, payload);
+        setFeedbacksList(prev => prev.map(f => f.id === editingId ? updated : f));
+        toast.success('Feedback updated successfully');
+      } else {
+        const created = await feedbackApi.create(payload);
+        setFeedbacksList(prev => [created, ...prev]);
+        toast.success('Feedback added successfully');
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Failed to save feedback:', error);
+      toast.error('Failed to save feedback');
     }
-    setIsModalOpen(false);
   };
 
-  const filteredFeedbacks = feedbacksList.filter(f =>
-    f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (f.feedback && f.feedback.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const hasActiveFilters = searchTerm;
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  const filteredFeedbacks = feedbacksList.filter(f => {
+    const term = searchTerm.toLowerCase();
+    return !searchTerm ||
+      (f.name || '').toLowerCase().includes(term) ||
+      (f.profession || '').toLowerCase().includes(term) ||
+      (f.feedback || '').toLowerCase().includes(term);
+  });
 
   const totalPages = Math.ceil(filteredFeedbacks.length / itemsPerPage);
   const paginatedFeedbacks = filteredFeedbacks.slice(
@@ -126,18 +166,25 @@ const AdminFeedback = () => {
 
       <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/60 overflow-hidden">
         <div className="p-4 md:p-5 border-b border-neutral-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-neutral-50/30">
-          <div className="relative w-full sm:w-72">
-            <input 
-              type="text" 
-              placeholder="Search feedbacks..." 
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
-            />
-            <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-72">
+              <input 
+                type="text" 
+                placeholder="Search by name, profession..." 
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
+              />
+              <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+            </div>
+            {hasActiveFilters && (
+              <button onClick={clearAllFilters} className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium border border-red-200">
+                <X size={14} /> Clear
+              </button>
+            )}
           </div>
           <div className="text-sm font-medium text-neutral-500 bg-white px-4 py-2 rounded-lg border border-neutral-200 shadow-sm self-start sm:self-auto">
             Total: <span className="text-navy font-bold">{filteredFeedbacks.length}</span>
@@ -147,6 +194,7 @@ const AdminFeedback = () => {
           <table className="w-full text-left border-collapse whitespace-nowrap">
             <thead>
               <tr className="bg-neutral-50/50 text-neutral-500 text-xs uppercase tracking-wider font-semibold border-b border-neutral-100">
+                <th className="p-4 font-medium">S.No</th>
                 <th className="p-4 font-medium">Name</th>
                 <th className="p-4 font-medium">Profession</th>
                 <th className="p-4 font-medium">Rating</th>
@@ -155,8 +203,9 @@ const AdminFeedback = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100/60">
-              {paginatedFeedbacks.map(f => (
+              {paginatedFeedbacks.map((f, idx) => (
                 <tr key={f.id} className="hover:bg-neutral-50/80 transition-colors group">
+                  <td className="p-4 text-sm text-neutral-600">{(currentPage - 1) * itemsPerPage + idx + 1}</td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       {f.image && (
@@ -178,7 +227,7 @@ const AdminFeedback = () => {
                       <button onClick={() => handleOpenModal(f, false)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-blue-100" title="Edit">
                         <SquarePen size={16} />
                       </button>
-                      <button onClick={() => handleDelete(f.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-red-100" title="Delete">
+                      <button onClick={() => setDeleteId(f.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors shadow-sm border border-transparent hover:border-red-100" title="Delete">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -304,7 +353,7 @@ const AdminFeedback = () => {
                     
                     <div className="md:col-span-2">
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Profile Image</label>
-                      <input type="file" id="feedback-profile-input" accept="image/*" className="hidden" onChange={e => setFormData({...formData, image: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null})} />
+                      <input type="file" id="feedback-profile-input" accept="image/*" className="hidden" onChange={e => { const file = e.target.files[0]; setFormData({...formData, imageFile: file || null, image: file ? URL.createObjectURL(file) : null}); }} />
                       {formData.image ? (
                         <div className="flex flex-col items-center justify-center gap-3 py-6">
                           <label htmlFor="feedback-profile-input" className="cursor-pointer group relative">
@@ -317,7 +366,7 @@ const AdminFeedback = () => {
                               </span>
                             </div>
                           </label>
-                          <button type="button" onClick={() => setFormData({...formData, image: null})} className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 hover:underline text-sm font-medium transition-colors">
+                          <button type="button" onClick={() => setFormData({...formData, image: null, imageFile: null})} className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 hover:underline text-sm font-medium transition-colors">
                             <Trash2 size={15} /> Remove photo
                           </button>
                         </div>
@@ -353,6 +402,29 @@ const AdminFeedback = () => {
                 )}
               </div>
             </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {deleteId && createPortal(
+        <div className="fixed inset-0 bg-neutral-900/50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200" style={{ zIndex: 9999 }}>
+          <div className="bg-white rounded-md shadow-xl w-full max-w-sm animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="p-8 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                <Trash2 size={24} className="text-red-600" />
+              </div>
+              <h3 className="text-lg font-bold text-black mb-2">Delete Feedback</h3>
+              <p className="text-sm text-neutral-500">Are you sure you want to delete this feedback? This action cannot be undone.</p>
+            </div>
+            <div className="px-6 py-4 bg-neutral-50 flex items-center justify-center gap-3 border-t border-neutral-100">
+              <button onClick={() => setDeleteId(null)} className="flex-1 px-5 py-2.5 bg-[#4b5563] text-white rounded-xl text-sm hover:bg-[#374151] transition-colors font-semibold shadow-sm text-center">
+                Cancel
+              </button>
+              <button onClick={handleDelete} className="flex-1 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm transition-colors font-semibold shadow-sm text-center">
+                Delete
+              </button>
+            </div>
           </div>
         </div>,
         document.body
