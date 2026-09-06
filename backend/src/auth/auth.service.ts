@@ -17,11 +17,14 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.prisma.admin.findUnique({ where: { email } });
-    if (user && await bcrypt.compare(pass, user.password)) {
+    if (!user) {
+      throw new UnauthorizedException('Email is not registered');
+    }
+    if (await bcrypt.compare(pass, user.password)) {
       const { password, ...result } = user;
       return result;
     }
-    return null;
+    throw new UnauthorizedException('Invalid password');
   }
 
   async login(user: any) {
