@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query, Patch } from '@nestjs/common';
 import { TherapistService } from './therapist.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
@@ -15,13 +15,18 @@ export class TherapistController {
   }
 
   @Get()
-  findAll() {
-    return this.therapistService.findAll();
+  findAll(@Query() query: any) {
+    return this.therapistService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.therapistService.findOne(+id);
+  }
+
+  @Patch(':id/toggle')
+  toggleActive(@Param('id') id: string) {
+    return this.therapistService.toggleActive(+id);
   }
 
   @Put(':id')

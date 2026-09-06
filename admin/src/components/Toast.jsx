@@ -54,7 +54,7 @@ const ToastCard = ({ toast, onClose }) => {
         </div>
         <div className="flex-1 min-w-0 pt-0.5">
           <p className="text-sm font-semibold text-navy leading-none">{toast.title || title}</p>
-          <p className="text-[13px] text-neutral-500 mt-1.5 leading-snug break-words">{toast.message}</p>
+          {toast.message && <p className="text-[13px] text-neutral-500 mt-1.5 leading-snug break-words">{toast.message}</p>}
         </div>
         <button
           onClick={onClose}
@@ -115,7 +115,7 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={toast}>
       {children}
-      <div className="fixed top-5 right-5 z-[100] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+      <div className="fixed top-5 right-5 z-[10000] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
         {toasts.map((t) => (
           <div key={t.id} className="pointer-events-auto">
             <ToastCard toast={t} onClose={() => removeToast(t.id)} />
