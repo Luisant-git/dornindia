@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, BookOpen, MessageSquare, Video } from 'lucide-react';
-// Importing mock data from the frontend app folder
-import { instructors, advancedTherapists, generalTherapists } from '../../../frontend/src/data/therapistsData';
-import { classes } from '../../../frontend/src/data/classes';
-import { testimonials } from '../../../frontend/src/data/testimonials';
-import { tutorials } from '../../../frontend/src/data/tutorials';
+import { therapistsApi } from '../api/therapistsApi';
+import { classesApi } from '../api/classesApi';
+import { tutorialsApi } from '../api/tutorialsApi';
+import { feedbackApi } from '../api/feedbackApi';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -16,17 +15,27 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    const storedTherapists = JSON.parse(localStorage.getItem('admin_therapists')) || [...instructors, ...advancedTherapists, ...generalTherapists];
-    const storedClasses = JSON.parse(localStorage.getItem('admin_classes')) || classes;
-    const storedTutorials = JSON.parse(localStorage.getItem('admin_tutorials')) || tutorials;
-    const storedFeedbacks = JSON.parse(localStorage.getItem('admin_feedbacks')) || testimonials;
+    const fetchAllData = async () => {
+      try {
+        const [therapistsData, classesData, tutorialsData, feedbacksData] = await Promise.all([
+          therapistsApi.getAll().catch(() => []),
+          classesApi.getAll().catch(() => []),
+          tutorialsApi.getAll().catch(() => []),
+          feedbackApi.getAll().catch(() => [])
+        ]);
 
-    setStats({
-      therapists: storedTherapists.length,
-      classes: storedClasses.length,
-      testimonials: storedFeedbacks.length,
-      tutorials: storedTutorials.length
-    });
+        setStats({
+          therapists: therapistsData.length || 0,
+          classes: classesData.length || 0,
+          testimonials: feedbacksData.length || 0,
+          tutorials: tutorialsData.length || 0
+        });
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error);
+      }
+    };
+
+    fetchAllData();
   }, []);
 
   const statCards = [

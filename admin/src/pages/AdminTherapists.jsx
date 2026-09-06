@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Search, Eye, SquarePen, ChevronLeft, ChevronRight, Upload, User } from 'lucide-react';
-import { instructors, advancedTherapists, generalTherapists } from '../../../frontend/src/data/therapistsData';
 import { useToast } from '../components/Toast';
+import { therapistsApi } from '../api/therapistsApi';
 
 const AdminTherapists = () => {
   const toast = useToast();
@@ -23,18 +23,16 @@ const AdminTherapists = () => {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('admin_therapists');
-    if (saved) {
-      setTherapists(JSON.parse(saved));
-    } else {
-      const initial = [
-        ...instructors.map(t => ({ ...t, category: 'instructor' })),
-        ...advancedTherapists.map(t => ({ ...t, category: 'advanced' })),
-        ...generalTherapists.map(t => ({ ...t, category: 'general' }))
-      ];
-      setTherapists(initial);
-      localStorage.setItem('admin_therapists', JSON.stringify(initial));
-    }
+    const fetchTherapists = async () => {
+      try {
+        const data = await therapistsApi.getAll();
+        setTherapists(data);
+      } catch (error) {
+        console.error('Failed to fetch therapists:', error);
+        setTherapists([]);
+      }
+    };
+    fetchTherapists();
   }, []);
 
   const saveToStorage = (data) => {

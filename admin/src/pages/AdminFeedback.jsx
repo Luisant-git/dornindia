@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, Star, StarHalf, User } from 'lucide-react';
-import { testimonials as initialTestimonials } from '../../../frontend/src/data/testimonials';
 import { useToast } from '../components/Toast';
+import { feedbackApi } from '../api/feedbackApi';
 
 const AdminFeedback = () => {
   const toast = useToast();
@@ -22,13 +22,16 @@ const AdminFeedback = () => {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('admin_feedbacks');
-    if (saved) {
-      setFeedbacksList(JSON.parse(saved));
-    } else {
-      setFeedbacksList(initialTestimonials);
-      localStorage.setItem('admin_feedbacks', JSON.stringify(initialTestimonials));
-    }
+    const fetchFeedback = async () => {
+      try {
+        const data = await feedbackApi.getAll();
+        setFeedbacksList(data);
+      } catch (error) {
+        console.error('Failed to fetch feedback:', error);
+        setFeedbacksList([]);
+      }
+    };
+    fetchFeedback();
   }, []);
 
   const saveToStorage = (data) => {

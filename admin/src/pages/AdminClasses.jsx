@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload } from 'lucide-react';
-import { classes as initialClasses } from '../../../frontend/src/data/classes';
 import { useToast } from '../components/Toast';
+import { classesApi } from '../api/classesApi';
 
 const AdminClasses = () => {
   const toast = useToast();
@@ -24,13 +24,16 @@ const AdminClasses = () => {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('admin_classes');
-    if (saved) {
-      setClassesList(JSON.parse(saved));
-    } else {
-      setClassesList(initialClasses);
-      localStorage.setItem('admin_classes', JSON.stringify(initialClasses));
-    }
+    const fetchClasses = async () => {
+      try {
+        const data = await classesApi.getAll();
+        setClassesList(data);
+      } catch (error) {
+        console.error('Failed to fetch classes:', error);
+        setClassesList([]);
+      }
+    };
+    fetchClasses();
   }, []);
 
   const saveToStorage = (data) => {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '../components/Toast';
+import { authApi } from '../api/authApi';
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -11,14 +12,15 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (username === 'user@example.com' && password === 'password123') {
+    try {
+      await authApi.login({ email: username, password });
       localStorage.setItem('isAdminAuth', 'true');
       toast.success('Login successfully');
       navigate('/');
-    } else {
-      setError('Invalid credentials. Please try again.');
+    } catch (err) {
+      setError(err.message || 'Invalid credentials. Please try again.');
     }
   };
 
@@ -84,7 +86,7 @@ const AdminLogin = () => {
             type="submit"
             className="w-full bg-[#00a3e0] hover:bg-[#0082b3] text-white font-medium py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(0,163,224,0.3)] hover:shadow-[0_6px_20px_rgba(0,163,224,0.4)] hover:-translate-y-0.5 mt-4"
           >
-            Sign In 
+            Sign In
           </button>
         </form>
       </div>

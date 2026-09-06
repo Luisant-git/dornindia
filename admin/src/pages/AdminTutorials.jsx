@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Edit2, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, Link2 } from 'lucide-react';
-import { tutorials as initialTutorials } from '../../../frontend/src/data/tutorials';
 import { useToast } from '../components/Toast';
+import { tutorialsApi } from '../api/tutorialsApi';
 
 const AdminTutorials = () => {
   const toast = useToast();
@@ -22,13 +22,16 @@ const AdminTutorials = () => {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('admin_tutorials');
-    if (saved) {
-      setTutorialsList(JSON.parse(saved));
-    } else {
-      setTutorialsList(initialTutorials);
-      localStorage.setItem('admin_tutorials', JSON.stringify(initialTutorials));
-    }
+    const fetchTutorials = async () => {
+      try {
+        const data = await tutorialsApi.getAll();
+        setTutorialsList(data);
+      } catch (error) {
+        console.error('Failed to fetch tutorials:', error);
+        setTutorialsList([]);
+      }
+    };
+    fetchTutorials();
   }, []);
 
   const saveToStorage = (data) => {
