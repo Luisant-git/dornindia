@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, BookOpen, Video, MessageSquare, LogOut, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, Video, MessageSquare, LogOut, Globe, X } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -20,12 +20,29 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-navy text-white flex flex-col h-screen sticky top-0 border-r border-navy/90 shadow-xl relative overflow-hidden">
-      <div className="p-6">
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-navy text-white flex flex-col h-screen transform transition-transform duration-300 ease-in-out md:translate-x-0 md:sticky md:top-0 border-r border-navy/90 shadow-xl overflow-hidden ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+      <div className="p-6 flex items-center justify-between">
         <div className="font-heading font-bold text-xl tracking-wider flex items-center text-white">
           <img src="/favicon.png" alt="Dorn India Logo" className="h-10 w-auto mr-3 object-contain bg-white rounded-full p-1 shadow-sm border border-neutral-100" />
           DORN INDIA
         </div>
+        <button 
+          onClick={() => setIsOpen(false)}
+          className="md:hidden text-neutral-400 hover:text-white transition-colors"
+        >
+          <X size={24} />
+        </button>
       </div>
 
       <nav className="flex-1 px-4 mt-4 space-y-1 relative z-10">
@@ -35,6 +52,7 @@ const Sidebar = () => {
             <Link
               key={item.path}
               to={item.path}
+              onClick={() => setIsOpen && setIsOpen(false)}
               className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                 isActive 
                   ? 'text-white font-bold bg-[#00a3e0]' 
@@ -60,6 +78,7 @@ const Sidebar = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

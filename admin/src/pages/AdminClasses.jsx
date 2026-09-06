@@ -102,14 +102,14 @@ const AdminClasses = () => {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-end mb-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-navy tracking-tight">Classes Master</h1>
+          <h1 className="text-2xl md:text-3xl font-heading font-bold text-navy tracking-tight">Classes Master</h1>
           <p className="text-neutral-500 mt-1">Manage training classes and seminars.</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="bg-[#00a3e0] hover:bg-[#0082b3] text-white px-5 py-2.5 rounded-xl flex items-center transition-all shadow-[0_4px_15px_rgba(0,163,224,0.3)] hover:shadow-[0_6px_20px_rgba(0,163,224,0.4)] hover:-translate-y-0.5 font-medium"
+          className="bg-[#00a3e0] hover:bg-[#0082b3] text-white px-5 py-2.5 rounded-xl flex items-center justify-center transition-all shadow-[0_4px_15px_rgba(0,163,224,0.3)] hover:shadow-[0_6px_20px_rgba(0,163,224,0.4)] hover:-translate-y-0.5 font-medium w-full sm:w-auto"
         >
           <Plus size={18} className="mr-2" />
           Add Class
@@ -117,8 +117,8 @@ const AdminClasses = () => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/60 overflow-hidden">
-        <div className="p-5 border-b border-neutral-100 flex justify-between items-center bg-neutral-50/30">
-          <div className="relative w-72">
+        <div className="p-4 md:p-5 border-b border-neutral-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-neutral-50/30">
+          <div className="relative w-full sm:w-72">
             <input 
               type="text" 
               placeholder="Search classes..." 
@@ -131,7 +131,7 @@ const AdminClasses = () => {
             />
             <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
           </div>
-          <div className="text-sm font-medium text-neutral-500 bg-white px-4 py-2 rounded-lg border border-neutral-200 shadow-sm">
+          <div className="text-sm font-medium text-neutral-500 bg-white px-4 py-2 rounded-lg border border-neutral-200 shadow-sm self-start sm:self-auto">
             Total: <span className="text-navy font-bold">{filteredClasses.length}</span>
           </div>
         </div>
@@ -190,7 +190,7 @@ const AdminClasses = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/30 flex items-center justify-between">
+          <div className="px-4 md:px-6 py-4 border-t border-neutral-100 bg-neutral-50/30 flex flex-col sm:flex-row items-center justify-between gap-4">
             <span className="text-sm text-neutral-500">
               Showing <span className="font-medium text-navy">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-navy">{Math.min(currentPage * itemsPerPage, filteredClasses.length)}</span> of <span className="font-medium text-navy">{filteredClasses.length}</span> results
             </span>

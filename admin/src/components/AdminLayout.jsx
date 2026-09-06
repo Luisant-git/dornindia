@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { UserCircle, LogOut } from 'lucide-react';
+import { UserCircle, LogOut, Menu } from 'lucide-react';
 
 const AdminLayout = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -12,12 +13,18 @@ const AdminLayout = () => {
     navigate('/admin/login');
   };
   return (
-    <div className="flex min-h-screen bg-white font-sans selection:bg-[#00a3e0]/20 selection:text-navy">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
-        <header className="sticky top-0 z-30 bg-white border-b border-neutral-100 h-20 flex items-center justify-between px-8">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-heading font-semibold text-navy tracking-tight">Admin Portal</h1>
+    <div className="flex min-h-screen bg-white font-sans selection:bg-[#00a3e0]/20 selection:text-navy relative">
+      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 w-full">
+        <header className="sticky top-0 z-30 bg-white border-b border-neutral-100 h-20 flex items-center justify-between px-4 md:px-8">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 md:hidden text-navy hover:bg-neutral-100 rounded-lg transition-colors"
+            >
+              <Menu size={24} />
+            </button>
+            <h1 className="text-xl md:text-2xl font-heading font-semibold text-navy tracking-tight truncate">Admin Portal</h1>
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3 pl-6 relative">
@@ -53,7 +60,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </header>
-        <main className="flex-1 p-8 lg:p-12 overflow-auto custom-scrollbar">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-auto custom-scrollbar">
           <Outlet />
         </main>
       </div>
