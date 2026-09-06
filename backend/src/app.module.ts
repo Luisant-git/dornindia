@@ -8,6 +8,7 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { TutorialModule } from './tutorial/tutorial.module';
 import { UploadModule } from './upload/upload.module';
 import { AuthModule } from './auth/auth.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -24,6 +25,7 @@ import { AppService } from './app.service';
     TutorialModule,
     UploadModule,
     AuthModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

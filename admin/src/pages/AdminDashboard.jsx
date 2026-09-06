@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, BookOpen, MessageSquare, Video } from 'lucide-react';
-import { therapistsApi } from '../api/therapistsApi';
-import { classesApi } from '../api/classesApi';
-import { tutorialsApi } from '../api/tutorialsApi';
-import { feedbackApi } from '../api/feedbackApi';
+import { dashboardApi } from '../api/dashboardApi';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -15,27 +12,21 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    const fetchAllData = async () => {
+    const fetchStats = async () => {
       try {
-        const [therapistsData, classesData, tutorialsData, feedbacksData] = await Promise.all([
-          therapistsApi.getAll().catch(() => []),
-          classesApi.getAll().catch(() => []),
-          tutorialsApi.getAll().catch(() => []),
-          feedbackApi.getAll().catch(() => [])
-        ]);
-
+        const data = await dashboardApi.getStats();
         setStats({
-          therapists: therapistsData.length || 0,
-          classes: classesData.length || 0,
-          testimonials: feedbacksData.length || 0,
-          tutorials: tutorialsData.length || 0
+          therapists: data.therapists || 0,
+          classes: data.classes || 0,
+          testimonials: data.testimonials || 0,
+          tutorials: data.tutorials || 0
         });
       } catch (error) {
         console.error('Failed to fetch dashboard stats:', error);
       }
     };
 
-    fetchAllData();
+    fetchStats();
   }, []);
 
   const statCards = [
