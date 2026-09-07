@@ -129,7 +129,7 @@ const Directory = () => {
             </div>
 
             <h3 className="text-xl font-heading font-bold text-navy mb-6">
-              Therapist Directory 1 to {therapists.length} {filters.years.length > 0 ? `(${filters.years[0]} - ${filters.years[filters.years.length - 1]})` : ''}
+              Therapist Directory 1 to {therapists.length} {filters.years.length > 0 ? (filters.years[0] === filters.years[filters.years.length - 1] ? `(${filters.years[0]})` : `(${filters.years[0]} - ${filters.years[filters.years.length - 1]})`) : ''}
             </h3>
 
             <div className="flex flex-col md:flex-row gap-4 bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-8">
@@ -159,8 +159,8 @@ const Directory = () => {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {filteredTherapists.map((practitioner) => (
-                  <PractitionerCard key={practitioner.id} practitioner={practitioner} isGeneral={true} />
+                {filteredTherapists.map((practitioner, index) => (
+                  <PractitionerCard key={practitioner.id} practitioner={practitioner} isGeneral={true} sno={index + 1} />
                 ))}
                 {filteredTherapists.length === 0 && (
                   <div className="col-span-full bg-white p-12 rounded-3xl text-center text-neutral-500 shadow-sm border border-neutral-100 flex flex-col items-center">
