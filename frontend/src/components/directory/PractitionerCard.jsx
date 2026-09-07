@@ -12,16 +12,24 @@ const PractitionerCard = ({ practitioner, isGeneral = false }) => {
     if (parts.length === 0) return 'D';
     if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      const [year, month, day] = parts;
+      return `${day}/${month}/${year}`;
+    }
+    return dateString;
   };
 
   if (isGeneral) {
     return (
-      <div className="group bg-white rounded-xl shadow-sm border border-neutral-100/80 p-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+      <div className="group bg-white rounded-xl shadow-sm border border-neutral-100/80 p-5 sm:p-6 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
         <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#00a3e0] to-[#00729e] opacity-80 group-hover:opacity-100 transition-opacity"></div>
         
         {/* Avatar & Name */}
-        <div className="flex items-center gap-4 sm:min-w-[260px] md:min-w-[320px]">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#f8fafc] text-[#00a3e0] flex-shrink-0 flex items-center justify-center font-heading font-bold text-2xl border-2 border-white shadow-sm relative z-10">
+        <div className="flex items-center gap-4 sm:min-w-[280px] md:min-w-[340px]">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#f8fafc] text-[#00a3e0] flex-shrink-0 flex items-center justify-center font-heading font-bold text-3xl border-2 border-white shadow-sm relative z-10">
             {practitioner.image ? (
               <img src={practitioner.image} alt={practitioner.name} className="w-full h-full rounded-full object-cover" />
             ) : (
@@ -51,7 +59,7 @@ const PractitionerCard = ({ practitioner, isGeneral = false }) => {
           )}
           {practitioner.date && (
             <div className="flex items-center gap-2 font-medium text-neutral-700">
-              <Calendar size={15} className="text-purple-500"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden md:inline">Added:</span>{practitioner.date}</span>
+              <Calendar size={15} className="text-purple-500"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden md:inline">Completed Date:</span>{formatDate(practitioner.date)}</span>
             </div>
           )}
         </div>

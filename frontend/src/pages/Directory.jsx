@@ -28,14 +28,14 @@ const Directory = () => {
 
   const filters = useMemo(() => {
     const batches = [...new Set(therapists.map(t => t.batch).filter(Boolean))].sort();
-    const years = [...new Set(therapists.map(t => t.date ? t.date.slice(-4) : null).filter(Boolean))].sort();
+    const years = [...new Set(therapists.map(t => t.date ? t.date.split('-')[0] : null).filter(Boolean))].sort();
     return { batches, years };
   }, [therapists]);
 
   const filteredTherapists = therapists.filter(t => {
     const nameMatch = t.name.toLowerCase().includes(searchTerm.toLowerCase());
     const batchMatch = filterBatch === 'all' || t.batch === filterBatch;
-    const yearMatch = filterYear === 'all' || (t.date && t.date.slice(-4) === filterYear);
+    const yearMatch = filterYear === 'all' || (t.date && t.date.split('-')[0] === filterYear);
     return nameMatch && batchMatch && yearMatch;
   });
 
