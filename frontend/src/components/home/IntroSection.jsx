@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from '../common/Button';
 import { CheckCircle } from 'lucide-react';
+import earthImg from '../../assets/earth.webp';
 
 const IntroSection = () => {
   const features = [
@@ -15,11 +16,12 @@ const IntroSection = () => {
       <div className="container-custom">
         <div className="flex flex-col lg:flex-row items-center gap-16">
           <div className="lg:w-1/2 w-full">
-            <div className="relative">
+             <div className="relative flex items-center justify-center py-6">
+              <div className="absolute inset-x-6 inset-y-2 rounded-full bg-dorn-light/40 blur-3xl -z-10"></div>
               <img 
-                src="https://dorn-finder.de/assets/img/globe_home2.png" 
-                alt="World Map Banner" 
-                className="w-full h-auto object-cover"
+                src={earthImg}
+                alt="Earth" 
+                className="w-full max-w-md h-auto object-contain"
               />
             </div>
           </div>
