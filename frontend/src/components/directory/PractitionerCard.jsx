@@ -25,45 +25,40 @@ const PractitionerCard = ({ practitioner, isGeneral = false, sno }) => {
 
   if (isGeneral) {
     return (
-      <div className="group bg-white rounded-xl shadow-sm border border-neutral-100/80 px-5 py-6 sm:px-6 sm:py-8 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8">
-        {/* S.No & Avatar & Name */}
-        <div className="flex items-center gap-4 sm:gap-5 sm:min-w-[280px] md:min-w-[340px] lg:min-w-[380px]">
-          {sno && (
-            <div className="text-xl sm:text-2xl font-black text-navy min-w-[30px] sm:min-w-[40px] text-right font-heading">
-              {sno}.
+      <div className="bg-white px-4 py-6 border-b border-neutral-200 flex flex-row items-start gap-3 sm:gap-6 w-full hover:bg-neutral-50/50 transition-colors">
+        {/* Left: S.No */}
+        {sno && (
+          <div className="font-bold text-lg text-neutral-800 min-w-[30px] sm:min-w-[40px] pt-0.5">
+            {sno}.
+          </div>
+        )}
+        
+        {/* Center: Details */}
+        <div className="flex-grow flex flex-col gap-1.5 pr-2 sm:pr-4">
+          <div className="text-[17px] sm:text-lg leading-snug">
+            <span className="font-bold text-neutral-900">{practitioner.name}</span>
+            {practitioner.designation && <span className="text-neutral-700">, {practitioner.designation}</span>}
+          </div>
+          
+          {practitioner.address && (
+            <div className="text-neutral-600 text-sm sm:text-[15px] leading-relaxed break-words">
+              {practitioner.address}
             </div>
           )}
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#f8fafc] text-[#00a3e0] flex-shrink-0 flex items-center justify-center font-heading font-bold text-3xl border-2 border-white shadow-sm relative z-10">
-            {practitioner.image ? (
-              <img src={practitioner.image} alt={practitioner.name} className="w-full h-full rounded-full object-cover" />
-            ) : (
-              getInitials(practitioner.name)
-            )}
-          </div>
-          <div className="flex-grow">
-            <h4 className="font-heading font-bold text-lg sm:text-xl text-navy mb-1 leading-tight pr-2">{practitioner.name}</h4>
-            {practitioner.designation && <span className="text-xs sm:text-sm font-semibold text-[#00a3e0] tracking-wide uppercase">{practitioner.designation}</span>}
+          
+          <div className="text-neutral-700 text-sm sm:text-[15px] mt-1 font-medium">
+            {practitioner.batch && <span>{practitioner.batch} </span>}
+            {practitioner.date && <span>Date : {formatDate(practitioner.date)}</span>}
           </div>
         </div>
-
-        {/* Details Divider for Desktop */}
-        <div className="hidden sm:block w-px h-16 bg-neutral-200 shrink-0"></div>
-
-        {/* Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-sm text-neutral-600 flex-grow w-full mt-2 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0 border-neutral-100 items-center">
-          {practitioner.batch && (
-            <div className="flex items-center gap-2 font-medium text-neutral-700">
-              <Calendar size={16} className="text-[#00a3e0] flex-shrink-0"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden lg:inline">Batch:</span>{practitioner.batch}</span>
-            </div>
-          )}
-          {practitioner.address && (
-            <div className="flex items-start gap-2 font-medium text-neutral-700 max-w-xs">
-              <MapPin size={16} className="text-emerald-500 mt-0.5 flex-shrink-0"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden lg:inline">Location:</span>{practitioner.address}</span>
-            </div>
-          )}
-          {practitioner.date && (
-            <div className="flex items-center gap-2 font-medium text-neutral-700">
-              <Calendar size={16} className="text-purple-500 flex-shrink-0"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden lg:inline">Completed Date:</span>{formatDate(practitioner.date)}</span>
+        
+        {/* Right: Image */}
+        <div className="flex-shrink-0 w-24 h-32 sm:w-[110px] sm:h-[140px] bg-neutral-100 overflow-hidden border border-neutral-200 shadow-sm">
+          {practitioner.image ? (
+            <img src={practitioner.image} alt={practitioner.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center font-bold text-3xl text-neutral-400 bg-neutral-100">
+              {getInitials(practitioner.name)}
             </div>
           )}
         </div>
@@ -77,13 +72,13 @@ const PractitionerCard = ({ practitioner, isGeneral = false, sno }) => {
         <div className="flex items-start gap-4 mb-4">
           <div className="flex-shrink-0">
             {practitioner.image ? (
-              <img 
-                src={practitioner.image} 
-                alt={practitioner.name} 
-                className="w-16 h-16 rounded-full object-cover border-2 border-dorn-light"
+              <img
+                src={practitioner.image}
+                alt={practitioner.name}
+                className="w-16 h-16 rounded-xl object-cover border-2 border-dorn-light"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-dorn-light text-dorn flex items-center justify-center font-heading font-bold text-xl border-2 border-white shadow-sm">
+              <div className="w-16 h-16 rounded-xl bg-dorn-light text-dorn flex items-center justify-center font-heading font-bold text-xl border-2 border-white shadow-sm">
                 {getInitials(practitioner.name)}
               </div>
             )}
