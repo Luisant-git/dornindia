@@ -37,6 +37,19 @@ const AdminClasses = () => {
     return value;
   };
 
+  const calculateDays = (start, end) => {
+    if (start && end) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      if (endDate >= startDate) {
+        const diffTime = endDate - startDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        return diffDays.toString();
+      }
+    }
+    return '';
+  };
+
   useEffect(() => {
     const fetchClasses = async () => {
       try {
@@ -373,12 +386,20 @@ const AdminClasses = () => {
                     
                     <div>
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Start Date <span className="text-red-500">*</span></label>
-                      <input required type="date" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
+                      <input required type="date" value={formData.startDate} onChange={e => {
+                        const newStart = e.target.value;
+                        const days = calculateDays(newStart, formData.endDate);
+                        setFormData({...formData, startDate: newStart, duration: days || formData.duration});
+                      }} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
                     </div>
                     
                     <div>
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">End Date <span className="text-red-500">*</span></label>
-                      <input required type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
+                      <input required type="date" value={formData.endDate} onChange={e => {
+                        const newEnd = e.target.value;
+                        const days = calculateDays(formData.startDate, newEnd);
+                        setFormData({...formData, endDate: newEnd, duration: days || formData.duration});
+                      }} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400 cursor-pointer" />
                     </div>
                     
                     <div>
