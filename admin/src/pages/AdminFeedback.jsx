@@ -305,6 +305,36 @@ const AdminFeedback = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
+                    <div className="md:col-span-2">
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Profile Image</label>
+                      <input type="file" id="feedback-profile-input" accept="image/*" className="hidden" onChange={e => { const file = e.target.files[0]; setFormData({...formData, imageFile: file || null, image: file ? URL.createObjectURL(file) : null}); }} />
+                      {formData.image ? (
+                        <div className="flex flex-col items-center justify-center gap-3 py-6">
+                          <label htmlFor="feedback-profile-input" className="cursor-pointer group relative">
+                            <div className="w-32 h-40 bg-neutral-100 overflow-hidden shadow-sm border border-neutral-200">
+                              <img src={formData.image} alt="Profile preview" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-neutral-700 text-xs font-semibold">
+                                <Upload size={14} /> Change
+                              </span>
+                            </div>
+                          </label>
+                          <button type="button" onClick={() => setFormData({...formData, image: null, imageFile: null})} className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 hover:underline text-sm font-medium transition-colors">
+                            <Trash2 size={15} /> Remove photo
+                          </button>
+                        </div>
+                      ) : (
+                        <label htmlFor="feedback-profile-input" className="group relative flex flex-col items-center justify-center w-full py-10 px-6 overflow-hidden rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50/60 hover:border-[#00a3e0]/60 hover:bg-[#00a3e0]/5 transition-all cursor-pointer text-center">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-sm border border-neutral-200 mb-3 group-hover:border-[#00a3e0]/40 group-hover:shadow-[#00a3e0]/10 transition-all">
+                            <Upload size={22} className="text-[#00a3e0]" />
+                          </div>
+                          <p className="text-sm font-semibold text-neutral-700">Upload profile image</p>
+                          <p className="text-xs text-neutral-400 mt-1">JPG or PNG, max 2MB</p>
+                        </label>
+                      )}
+                    </div>
+                    
                     <div>
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Name <span className="text-red-500">*</span></label>
                       <input required type="text" placeholder="Therapist name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
@@ -351,36 +381,6 @@ const AdminFeedback = () => {
                         <span className="ml-2 text-sm text-neutral-500">{formData.rating} / 5</span>
                       </div>
                       <p className="text-xs text-neutral-400 mt-2">Tap a star once for half fill, tap again for full.</p>
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Profile Image</label>
-                      <input type="file" id="feedback-profile-input" accept="image/*" className="hidden" onChange={e => { const file = e.target.files[0]; setFormData({...formData, imageFile: file || null, image: file ? URL.createObjectURL(file) : null}); }} />
-                      {formData.image ? (
-                        <div className="flex flex-col items-center justify-center gap-3 py-6">
-                          <label htmlFor="feedback-profile-input" className="cursor-pointer group relative">
-                            <div className="w-32 h-40 bg-neutral-100 overflow-hidden shadow-sm border border-neutral-200">
-                              <img src={formData.image} alt="Profile preview" className="w-full h-full object-cover" />
-                            </div>
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-neutral-700 text-xs font-semibold">
-                                <Upload size={14} /> Change
-                              </span>
-                            </div>
-                          </label>
-                          <button type="button" onClick={() => setFormData({...formData, image: null, imageFile: null})} className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 hover:underline text-sm font-medium transition-colors">
-                            <Trash2 size={15} /> Remove photo
-                          </button>
-                        </div>
-                      ) : (
-                        <label htmlFor="feedback-profile-input" className="group relative flex flex-col items-center justify-center w-full py-10 px-6 overflow-hidden rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-50/60 hover:border-[#00a3e0]/60 hover:bg-[#00a3e0]/5 transition-all cursor-pointer text-center">
-                          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-sm border border-neutral-200 mb-3 group-hover:border-[#00a3e0]/40 group-hover:shadow-[#00a3e0]/10 transition-all">
-                            <Upload size={22} className="text-[#00a3e0]" />
-                          </div>
-                          <p className="text-sm font-semibold text-neutral-700">Upload profile image</p>
-                          <p className="text-xs text-neutral-400 mt-1">JPG or PNG, max 2MB</p>
-                        </label>
-                      )}
                     </div>
                     
                     <div className="md:col-span-2">
