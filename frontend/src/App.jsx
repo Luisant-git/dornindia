@@ -12,6 +12,13 @@ import Contact from './pages/Contact';
 import LearningDorn from './pages/LearningDorn';
 import Directory from './pages/Directory';
 
+function AdminRedirect() {
+  React.useEffect(() => {
+    window.location.href = import.meta.env.DEV ? 'http://localhost:3001' : '/admin/';
+  }, []);
+  return <div className="p-8 text-center min-h-[50vh] flex items-center justify-center">Redirecting to Admin...</div>;
+}
+
 function App() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -26,6 +33,7 @@ function App() {
           <Route path="/tutorials" element={<Tutorials />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/directory" element={<Directory />} />
+          <Route path="/admin/*" element={<AdminRedirect />} />
         </Routes>
       </main>
       <Footer />
