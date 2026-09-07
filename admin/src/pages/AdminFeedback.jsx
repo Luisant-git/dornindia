@@ -285,7 +285,7 @@ const AdminFeedback = () => {
                   <div className="space-y-4 pt-2">
                     {formData.image && (
                       <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-lg border-neutral-200">
+                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg border-neutral-200">
                           <img src={formData.image} alt="Profile preview" className="w-full h-full object-cover" />
                         </div>
                       </div>
