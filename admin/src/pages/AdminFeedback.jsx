@@ -282,22 +282,24 @@ const AdminFeedback = () => {
               {/* Body */}
               <div className="px-8 pb-4 overflow-y-auto custom-scrollbar flex-1 bg-white">
                 {isViewMode ? (
-                  <div className="space-y-4 pt-2">
+                  <div className="flex flex-col gap-6 pt-2">
                     {formData.image && (
-                      <div className="flex justify-center mb-4">
-                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg border-neutral-200">
+                      <div className="flex justify-center">
+                        <div className="w-32 h-40 bg-neutral-100 overflow-hidden shadow-sm border border-neutral-200">
                           <img src={formData.image} alt="Profile preview" className="w-full h-full object-cover" />
                         </div>
                       </div>
                     )}
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Name:</strong> {formData.name || '-'}</div>
-                    <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Profession:</strong> {formData.profession || '-'}</div>
-                    <div className="text-[15px] text-neutral-800 flex items-center gap-2">
-                      <strong className="text-black font-bold">Rating:</strong> {rateStars(formData.rating)}
-                    </div>
-                    <div>
-                      <strong className="text-black font-bold block mb-1">Feedback:</strong>
-                      <div className="text-[15px] text-neutral-800 whitespace-pre-wrap leading-relaxed">"{formData.feedback || '-'}"</div>
+                    <div className="w-full space-y-4">
+                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Name:</strong> {formData.name || '-'}</div>
+                      <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Profession:</strong> {formData.profession || '-'}</div>
+                      <div className="text-[15px] text-neutral-800 flex items-center gap-2">
+                        <strong className="text-black font-bold">Rating:</strong> {rateStars(formData.rating)}
+                      </div>
+                      <div>
+                        <strong className="text-black font-bold block mb-1">Feedback:</strong>
+                        <div className="text-[15px] text-neutral-800 whitespace-pre-wrap leading-relaxed">"{formData.feedback || '-'}"</div>
+                      </div>
                     </div>
                   </div>
                 ) : (
