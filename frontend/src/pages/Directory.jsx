@@ -1,21 +1,38 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import { instructors, advancedTherapists, generalTherapists } from '../data/therapistsData';
+import { instructors, advancedTherapists } from '../data/therapistsData';
 import PractitionerCard from '../components/directory/PractitionerCard';
 import PageHeader from '../components/common/PageHeader';
+import { directoryApi } from '../api/directoryApi';
 
 const Directory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBatch, setFilterBatch] = useState('all');
   const [filterYear, setFilterYear] = useState('all');
+  const [therapists, setTherapists] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filters = useMemo(() => {
-    const batches = [...new Set(generalTherapists.map(t => t.batch).filter(Boolean))].sort();
-    const years = [...new Set(generalTherapists.map(t => t.date ? t.date.slice(-4) : null).filter(Boolean))].sort();
-    return { batches, years };
+  useEffect(() => {
+    const fetchTherapists = async () => {
+      try {
+        const data = await directoryApi.getAllTherapists();
+        setTherapists(data);
+      } catch (error) {
+        console.error('Error fetching therapists:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTherapists();
   }, []);
 
-  const filteredTherapists = generalTherapists.filter(t => {
+  const filters = useMemo(() => {
+    const batches = [...new Set(therapists.map(t => t.batch).filter(Boolean))].sort();
+    const years = [...new Set(therapists.map(t => t.date ? t.date.slice(-4) : null).filter(Boolean))].sort();
+    return { batches, years };
+  }, [therapists]);
+
+  const filteredTherapists = therapists.filter(t => {
     const nameMatch = t.name.toLowerCase().includes(searchTerm.toLowerCase());
     const batchMatch = filterBatch === 'all' || t.batch === filterBatch;
     const yearMatch = filterYear === 'all' || (t.date && t.date.slice(-4) === filterYear);
@@ -24,15 +41,15 @@ const Directory = () => {
 
   return (
     <div className="min-h-screen pt-20 bg-neutral-50">
-      <PageHeader 
+      <PageHeader
         title="Dorn Directory India"
         description="Find recognized Dorn Method Instructors and Therapists across India."
-        breadcrumbs={[{ label: 'Directory India' }]} 
+        breadcrumbs={[{ label: 'Directory India' }]}
       />
 
       <section className="py-16 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           {/* Disclaimer / Info block */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-neutral-100 mb-12">
             <h3 className="text-xl font-heading font-bold text-navy mb-4">Directory Guidelines</h3>
@@ -44,7 +61,7 @@ const Directory = () => {
             </p>
             <div className="bg-dorn-light/30 border-l-4 border-dorn p-4 rounded-r-lg">
               <p className="text-navy text-sm font-medium">
-                How to achieve Instructor Status:<br/>
+                How to achieve Instructor Status:<br />
                 To officially teach the DORN Method, candidates must complete a specialized instructor program under the guidance of Dr. Subash (AIDHA) or Thomas Zudrell (DORN International), culminating in a mandatory examination.
               </p>
             </div>
@@ -59,7 +76,7 @@ const Directory = () => {
               </h2>
               <div className="h-px bg-neutral-200 flex-grow"></div>
             </div>
-            
+
             <p className="text-center text-neutral-600 mb-8 max-w-3xl mx-auto">
               The individuals below are currently the only certified DORN Method Instructors operating in India who adhere strictly to the protocols set forth by AHHAI and DORN International.
             </p>
@@ -80,7 +97,7 @@ const Directory = () => {
               </h2>
               <div className="h-px bg-neutral-200 flex-grow"></div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {advancedTherapists.map((practitioner) => (
                 <PractitionerCard key={practitioner.id} practitioner={practitioner} />
@@ -110,16 +127,16 @@ const Directory = () => {
                 <span>Dr. K. Sethu Subramanian - 8903216987</span>
               </div>
             </div>
-            
+
             <h3 className="text-xl font-heading font-bold text-navy mb-6">
               Below: Therapist Directory 1 to 970 (2012 --- 2018)
             </h3>
 
             <div className="flex flex-col md:flex-row gap-4 bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-8">
               <div className="relative flex-grow">
-                <input 
-                  type="text" 
-                  placeholder="Search by name..." 
+                <input
+                  type="text"
+                  placeholder="Search by name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white"
@@ -136,20 +153,24 @@ const Directory = () => {
               </select>
             </div>
 
-            <div className="text-sm text-neutral-500 mb-4">
-              <strong className="text-navy">{filteredTherapists.length}</strong> Therapists
-            </div>
-
-            <div className="flex flex-col gap-3">
-              {filteredTherapists.map((practitioner) => (
-                <PractitionerCard key={practitioner.id} practitioner={practitioner} isGeneral={true} />
-              ))}
-              {filteredTherapists.length === 0 && (
-                <div className="bg-white p-8 rounded-2xl text-center text-neutral-500 shadow-sm border border-neutral-100">
-                  No therapists found.
-                </div>
-              )}
-            </div>
+            {loading ? (
+              <div className="py-12 flex justify-center">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#00a3e0]"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {filteredTherapists.map((practitioner) => (
+                  <PractitionerCard key={practitioner.id} practitioner={practitioner} isGeneral={true} />
+                ))}
+                {filteredTherapists.length === 0 && (
+                  <div className="col-span-full bg-white p-12 rounded-3xl text-center text-neutral-500 shadow-sm border border-neutral-100 flex flex-col items-center">
+                    <Search size={48} className="text-neutral-300 mb-4" />
+                    <h4 className="text-lg font-bold text-navy mb-1">No therapists found</h4>
+                    <p className="text-sm">Try adjusting your filters or search term.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
         </div>

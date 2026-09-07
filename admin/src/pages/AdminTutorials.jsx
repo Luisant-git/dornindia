@@ -9,6 +9,7 @@ const AdminTutorials = () => {
   const toast = useToast();
   const [tutorialsList, setTutorialsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -136,19 +137,25 @@ const AdminTutorials = () => {
     }
   };
 
-  const hasActiveFilters = searchTerm;
+  const hasActiveFilters = searchTerm || filterCategory;
 
   const clearAllFilters = () => {
     setSearchTerm('');
+    setFilterCategory('');
     setCurrentPage(1);
   };
 
+  const categories = [...new Set(tutorialsList.map(t => t.category).filter(Boolean))].sort();
+
   const filteredTutorials = tutorialsList.filter(t => {
     const term = searchTerm.toLowerCase();
-    return !searchTerm ||
+    const matchesSearch = !searchTerm ||
       (t.title || '').toLowerCase().includes(term) ||
       (t.category || '').toLowerCase().includes(term) ||
       (t.description || '').toLowerCase().includes(term);
+    const matchesCategory = !filterCategory || t.category === filterCategory;
+
+    return matchesSearch && matchesCategory;
   });
 
   const totalPages = Math.ceil(filteredTutorials.length / itemsPerPage);
@@ -188,6 +195,18 @@ const AdminTutorials = () => {
                 className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
               />
               <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={filterCategory}
+                onChange={(e) => { setFilterCategory(e.target.value); setCurrentPage(1); }}
+                className="w-full sm:w-48 px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white cursor-pointer"
+              >
+                <option value="">All Categories</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
             {hasActiveFilters && (
               <button onClick={clearAllFilters} className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium border border-red-200">

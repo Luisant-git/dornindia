@@ -17,6 +17,7 @@ const AdminClasses = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -142,14 +143,17 @@ const AdminClasses = () => {
     }
   };
 
-  const hasActiveFilters = searchTerm || dateFrom || dateTo;
+  const hasActiveFilters = searchTerm || dateFrom || dateTo || filterCategory;
 
   const clearAllFilters = () => {
     setSearchTerm('');
     setDateFrom('');
     setDateTo('');
+    setFilterCategory('');
     setCurrentPage(1);
   };
+
+  const categories = [...new Set(classesList.map(c => c.category).filter(Boolean))].sort();
 
   const filteredClasses = classesList.filter(c => {
     const term = searchTerm.toLowerCase();
@@ -160,8 +164,9 @@ const AdminClasses = () => {
 
     const matchesFrom = !dateFrom || (c.startDate && c.startDate >= dateFrom);
     const matchesTo = !dateTo || (c.startDate && c.startDate <= dateTo);
+    const matchesCategory = !filterCategory || c.category === filterCategory;
 
-    return matchesSearch && matchesFrom && matchesTo;
+    return matchesSearch && matchesFrom && matchesTo && matchesCategory;
   });
 
   const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
@@ -201,6 +206,18 @@ const AdminClasses = () => {
                 className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
               />
               <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={filterCategory}
+                onChange={(e) => { setFilterCategory(e.target.value); setCurrentPage(1); }}
+                className="w-full sm:w-48 px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white cursor-pointer"
+              >
+                <option value="">All Categories</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
             <div className="flex items-center gap-2">
               <input

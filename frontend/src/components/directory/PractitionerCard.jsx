@@ -7,7 +7,7 @@ const PractitionerCard = ({ practitioner, isGeneral = false }) => {
     let nameToUse = name;
     if (name.startsWith('Dr. ')) nameToUse = name.substring(4);
     else if (name.startsWith('Dr ')) nameToUse = name.substring(3);
-    
+
     const parts = nameToUse.split(' ').filter(p => p.length > 0 && p !== '.');
     if (parts.length === 0) return 'D';
     if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
@@ -16,26 +16,48 @@ const PractitionerCard = ({ practitioner, isGeneral = false }) => {
 
   if (isGeneral) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-100 p-4 hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <div className="w-10 h-10 rounded-full bg-navy text-white flex-shrink-0 flex items-center justify-center font-heading font-bold text-sm border-2 border-white shadow-sm">
-          {practitioner.id}
+      <div className="group bg-white rounded-xl shadow-sm border border-neutral-100/80 p-4 hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative overflow-hidden h-full flex flex-col">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00a3e0] to-[#00729e] opacity-80 group-hover:opacity-100 transition-opacity"></div>
+        
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="w-16 h-16 rounded-full bg-[#f8fafc] text-[#00a3e0] flex-shrink-0 flex items-center justify-center font-heading font-bold text-xl border-2 border-white shadow-sm relative z-10 mt-1">
+            {practitioner.image ? (
+              <img src={practitioner.image} alt={practitioner.name} className="w-full h-full rounded-full object-cover" />
+            ) : (
+              getInitials(practitioner.name)
+            )}
+          </div>
+          <div className="flex-grow flex flex-col justify-center">
+            <h4 className="font-heading font-bold text-lg text-navy mb-0.5 leading-tight">{practitioner.name}</h4>
+            {practitioner.designation && <span className="text-xs font-semibold text-[#00a3e0] tracking-wide uppercase">{practitioner.designation}</span>}
+          </div>
         </div>
-        <div className="flex-grow">
-          <div className="flex flex-col md:flex-row md:items-baseline md:gap-2 mb-1">
-            <h4 className="font-heading font-bold text-lg text-navy">{practitioner.name}</h4>
-            <span className="text-sm text-dorn font-semibold">{practitioner.title}</span>
-          </div>
-          <div className="flex flex-wrap gap-y-1 gap-x-4 text-xs text-neutral-600">
-            {practitioner.batch && (
-              <span className="flex items-center"><Calendar size={14} className="mr-1 flex-shrink-0 text-neutral-400"/> Batch: {practitioner.batch}</span>
-            )}
-            {practitioner.address && (
-              <span className="flex items-start"><MapPin size={14} className="mr-1 mt-0.5 flex-shrink-0 text-neutral-400"/> {practitioner.address}</span>
-            )}
-            {practitioner.date && (
-              <span className="flex items-center"><Calendar size={14} className="mr-1 flex-shrink-0 text-neutral-400"/> Date: {practitioner.date}</span>
-            )}
-          </div>
+
+        <div className="mt-5 flex flex-col gap-3.5 text-xs text-neutral-600 flex-grow border-t border-neutral-100 pt-4">
+          {practitioner.batch && (
+            <div className="flex flex-col gap-1 text-left">
+              <span className="font-semibold text-neutral-400 text-[10px] uppercase tracking-wider">Batch</span>
+              <div className="flex items-center gap-2 font-medium text-neutral-700">
+                <Calendar size={14} className="text-[#00a3e0]"/> {practitioner.batch}
+              </div>
+            </div>
+          )}
+          {practitioner.address && (
+            <div className="flex flex-col gap-1 text-left">
+              <span className="font-semibold text-neutral-400 text-[10px] uppercase tracking-wider">Location</span>
+              <div className="flex items-start gap-2 font-medium text-neutral-700">
+                <MapPin size={14} className="text-emerald-500 mt-0.5 flex-shrink-0"/> <span className="leading-snug">{practitioner.address}</span>
+              </div>
+            </div>
+          )}
+          {practitioner.date && (
+            <div className="flex flex-col gap-1 text-left">
+              <span className="font-semibold text-neutral-400 text-[10px] uppercase tracking-wider">Date Added</span>
+              <div className="flex items-center gap-2 font-medium text-neutral-700">
+                <Calendar size={14} className="text-purple-500"/> {practitioner.date}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -47,9 +69,9 @@ const PractitionerCard = ({ practitioner, isGeneral = false }) => {
         <div className="flex items-start gap-4 mb-4">
           <div className="flex-shrink-0">
             {practitioner.image ? (
-              <img 
-                src={practitioner.image} 
-                alt={practitioner.name} 
+              <img
+                src={practitioner.image}
+                alt={practitioner.name}
                 className="w-16 h-16 rounded-full object-cover border-2 border-dorn-light"
               />
             ) : (
