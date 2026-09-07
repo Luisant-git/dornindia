@@ -16,46 +16,42 @@ const PractitionerCard = ({ practitioner, isGeneral = false }) => {
 
   if (isGeneral) {
     return (
-      <div className="group bg-white rounded-xl shadow-sm border border-neutral-100/80 p-4 hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative overflow-hidden h-full flex flex-col">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00a3e0] to-[#00729e] opacity-80 group-hover:opacity-100 transition-opacity"></div>
+      <div className="group bg-white rounded-xl shadow-sm border border-neutral-100/80 p-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+        <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#00a3e0] to-[#00729e] opacity-80 group-hover:opacity-100 transition-opacity"></div>
         
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#f8fafc] text-[#00a3e0] flex-shrink-0 flex items-center justify-center font-heading font-bold text-xl border-2 border-white shadow-sm relative z-10 mt-1">
+        {/* Avatar & Name */}
+        <div className="flex items-center gap-4 sm:min-w-[260px] md:min-w-[320px]">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#f8fafc] text-[#00a3e0] flex-shrink-0 flex items-center justify-center font-heading font-bold text-2xl border-2 border-white shadow-sm relative z-10">
             {practitioner.image ? (
               <img src={practitioner.image} alt={practitioner.name} className="w-full h-full rounded-full object-cover" />
             ) : (
               getInitials(practitioner.name)
             )}
           </div>
-          <div className="flex-grow flex flex-col justify-center">
-            <h4 className="font-heading font-bold text-lg text-navy mb-0.5 leading-tight">{practitioner.name}</h4>
+          <div>
+            <h4 className="font-heading font-bold text-base sm:text-lg text-navy mb-0.5 leading-tight">{practitioner.name}</h4>
             {practitioner.designation && <span className="text-xs font-semibold text-[#00a3e0] tracking-wide uppercase">{practitioner.designation}</span>}
           </div>
         </div>
 
-        <div className="mt-5 flex flex-col gap-3.5 text-xs text-neutral-600 flex-grow border-t border-neutral-100 pt-4">
+        {/* Details Divider for Desktop */}
+        <div className="hidden sm:block w-px h-10 bg-neutral-200"></div>
+
+        {/* Details */}
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 text-sm text-neutral-600 flex-grow w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
           {practitioner.batch && (
-            <div className="flex flex-col gap-1 text-left">
-              <span className="font-semibold text-neutral-400 text-[10px] uppercase tracking-wider">Batch</span>
-              <div className="flex items-center gap-2 font-medium text-neutral-700">
-                <Calendar size={14} className="text-[#00a3e0]"/> {practitioner.batch}
-              </div>
+            <div className="flex items-center gap-2 font-medium text-neutral-700">
+              <Calendar size={15} className="text-[#00a3e0]"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden md:inline">Batch:</span>{practitioner.batch}</span>
             </div>
           )}
           {practitioner.address && (
-            <div className="flex flex-col gap-1 text-left">
-              <span className="font-semibold text-neutral-400 text-[10px] uppercase tracking-wider">Location</span>
-              <div className="flex items-start gap-2 font-medium text-neutral-700">
-                <MapPin size={14} className="text-emerald-500 mt-0.5 flex-shrink-0"/> <span className="leading-snug">{practitioner.address}</span>
-              </div>
+            <div className="flex items-start gap-2 font-medium text-neutral-700 max-w-xs">
+              <MapPin size={15} className="text-emerald-500 mt-0.5 flex-shrink-0"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden md:inline">Location:</span>{practitioner.address}</span>
             </div>
           )}
           {practitioner.date && (
-            <div className="flex flex-col gap-1 text-left">
-              <span className="font-semibold text-neutral-400 text-[10px] uppercase tracking-wider">Date Added</span>
-              <div className="flex items-center gap-2 font-medium text-neutral-700">
-                <Calendar size={14} className="text-purple-500"/> {practitioner.date}
-              </div>
+            <div className="flex items-center gap-2 font-medium text-neutral-700">
+              <Calendar size={15} className="text-purple-500"/> <span><span className="text-neutral-400 font-normal mr-1.5 hidden md:inline">Added:</span>{practitioner.date}</span>
             </div>
           )}
         </div>
