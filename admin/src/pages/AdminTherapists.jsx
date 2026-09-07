@@ -307,19 +307,21 @@ const AdminTherapists = () => {
               {/* Body */}
               <div className="px-8 pb-4 overflow-y-auto custom-scrollbar flex-1 bg-white">
                 {isViewMode ? (
-                  <div className="flex flex-row items-start gap-6 pt-2">
-                    <div className="flex-grow space-y-4">
+                  <div className="flex flex-col gap-6 pt-2">
+                    {formData.profile && (
+                      <div className="flex justify-center">
+                        <div className="w-32 h-40 bg-neutral-100 overflow-hidden shadow-sm border border-neutral-200">
+                          <img src={formData.profile} alt="Profile" className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    )}
+                    <div className="w-full space-y-4">
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Full Name:</strong> {formData.name || '-'}</div>
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Designation:</strong> {formData.designation || '-'}</div>
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Address:</strong> {formData.address || '-'}</div>
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Batch:</strong> {formData.batch || '-'}</div>
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Completed Date:</strong> {formatDate(formData.date)}</div>
                     </div>
-                    {formData.profile && (
-                      <div className="flex-shrink-0 w-32 h-40 bg-neutral-100 overflow-hidden shadow-sm border border-neutral-200">
-                        <img src={formData.profile} alt="Profile" className="w-full h-full object-cover" />
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -330,10 +332,10 @@ const AdminTherapists = () => {
                       {formData.profile ? (
                         <div className="flex flex-col items-center justify-center gap-3 py-6">
                           <label htmlFor="therapist-profile-input" className="cursor-pointer group relative">
-                            <div className="w-32 h-32 rounded-full overflow-hidden shadow-lg ring-4 ring-neutral-100 border border-neutral-200">
+                            <div className="w-32 h-40 bg-neutral-100 overflow-hidden shadow-sm border border-neutral-200">
                               <img src={formData.profile} alt="Profile preview" className="w-full h-full object-cover" />
                             </div>
-                            <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-neutral-700 text-xs font-semibold">
                                 <Upload size={14} /> Change
                               </span>

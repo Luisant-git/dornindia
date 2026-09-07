@@ -359,10 +359,10 @@ const AdminFeedback = () => {
                       {formData.image ? (
                         <div className="flex flex-col items-center justify-center gap-3 py-6">
                           <label htmlFor="feedback-profile-input" className="cursor-pointer group relative">
-                            <div className="w-32 h-32 rounded-full overflow-hidden shadow-lg ring-4 ring-neutral-100 border border-neutral-200">
+                            <div className="w-32 h-40 bg-neutral-100 overflow-hidden shadow-sm border border-neutral-200">
                               <img src={formData.image} alt="Profile preview" className="w-full h-full object-cover" />
                             </div>
-                            <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-neutral-700 text-xs font-semibold">
                                 <Upload size={14} /> Change
                               </span>

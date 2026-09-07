@@ -5,18 +5,13 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 
 const ContactInformation = () => {
   return (
-    <section className="section-padding bg-white text-neutral-900">
+    <section className="pt-8 pb-16 bg-white text-neutral-900">
       <div className="container-custom">
         <SectionTitle
-          label="GET IN TOUCH"
-          title="Contact Information"
+
+          title="GET IN TOUCH"
         />
 
-        <div className="text-center mb-12">
-          <p className="text-neutral-600 font-light text-lg">
-            Feel free to contact us for any information concerning DORN only!
-          </p>
-        </div>
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           {/* India Office */}
