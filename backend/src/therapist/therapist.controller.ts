@@ -14,6 +14,11 @@ export class TherapistController {
     return this.therapistService.create(createData);
   }
 
+  @Get('filters')
+  getFilters() {
+    return this.therapistService.getFilters();
+  }
+
   @Get()
   findAll(@Query() query: any) {
     return this.therapistService.findAll(query);

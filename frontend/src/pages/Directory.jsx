@@ -10,34 +10,52 @@ const Directory = () => {
   const [filterBatch, setFilterBatch] = useState('all');
   const [filterYear, setFilterYear] = useState('all');
   const [therapists, setTherapists] = useState([]);
+  const [totalTherapists, setTotalTherapists] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [filters, setFilters] = useState({ batches: [], years: [] });
+
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const data = await directoryApi.getFilters();
+        setFilters(data);
+      } catch (error) {
+        console.error('Error fetching filters:', error);
+      }
+    };
+    fetchFilters();
+  }, []);
 
   useEffect(() => {
     const fetchTherapists = async () => {
+      setLoading(true);
       try {
-        const data = await directoryApi.getAllTherapists();
-        setTherapists(data);
+        const data = await directoryApi.getTherapists({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: searchTerm,
+          batch: filterBatch,
+          year: filterYear
+        });
+        setTherapists(data.items || []);
+        setTotalTherapists(data.total || 0);
+        setTotalPages(data.totalPages || 1);
       } catch (error) {
         console.error('Error fetching therapists:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchTherapists();
-  }, []);
+    
+    const delayDebounceFn = setTimeout(() => {
+      fetchTherapists();
+    }, 300); // add a slight debounce for typing
 
-  const filters = useMemo(() => {
-    const batches = [...new Set(therapists.map(t => t.batch).filter(Boolean))].sort();
-    const years = [...new Set(therapists.map(t => t.date ? t.date.split('-')[0] : null).filter(Boolean))].sort();
-    return { batches, years };
-  }, [therapists]);
-
-  const filteredTherapists = therapists.filter(t => {
-    const nameMatch = t.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const batchMatch = filterBatch === 'all' || t.batch === filterBatch;
-    const yearMatch = filterYear === 'all' || (t.date && t.date.split('-')[0] === filterYear);
-    return nameMatch && batchMatch && yearMatch;
-  });
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, searchTerm, filterBatch, filterYear]);
 
   return (
     <div className="min-h-screen pt-20 bg-neutral-50">
@@ -129,7 +147,7 @@ const Directory = () => {
             </div>
 
             <h3 className="text-xl font-heading font-bold text-navy mb-6">
-              Therapist Directory 1 to {therapists.length} {filters.years.length > 0 ? (filters.years[0] === filters.years[filters.years.length - 1] ? `(${filters.years[0]})` : `(${filters.years[0]} - ${filters.years[filters.years.length - 1]})`) : ''}
+              Therapist Directory 1 to {totalTherapists} {filters.years.length > 0 ? (filters.years[0] === filters.years[filters.years.length - 1] ? `(${filters.years[0]})` : `(${filters.years[0]} - ${filters.years[filters.years.length - 1]})`) : ''}
             </h3>
 
             <div className="flex flex-col md:flex-row gap-4 bg-white p-5 rounded-2xl shadow-sm border border-neutral-100 mb-8">
@@ -138,16 +156,16 @@ const Directory = () => {
                   type="text"
                   placeholder="Search by name..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                   className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white"
                 />
                 <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
               </div>
-              <select value={filterBatch} onChange={e => setFilterBatch(e.target.value)} className="px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white cursor-pointer">
+              <select value={filterBatch} onChange={e => { setFilterBatch(e.target.value); setCurrentPage(1); }} className="px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white cursor-pointer">
                 <option value="all">All Batches</option>
                 {filters.batches.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
-              <select value={filterYear} onChange={e => setFilterYear(e.target.value)} className="px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white cursor-pointer">
+              <select value={filterYear} onChange={e => { setFilterYear(e.target.value); setCurrentPage(1); }} className="px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-dorn/20 focus:border-dorn text-sm transition-all shadow-sm bg-white cursor-pointer">
                 <option value="all">All Years</option>
                 {filters.years.map(y => <option key={y} value={y}>{y}</option>)}
               </select>
@@ -159,10 +177,35 @@ const Directory = () => {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {filteredTherapists.map((practitioner, index) => (
-                  <PractitionerCard key={practitioner.id} practitioner={practitioner} isGeneral={true} sno={index + 1} />
+                {therapists.map((practitioner, index) => (
+                  <PractitionerCard key={practitioner.id} practitioner={practitioner} isGeneral={true} sno={(currentPage - 1) * itemsPerPage + index + 1} />
                 ))}
-                {filteredTherapists.length === 0 && (
+                
+                {totalTherapists > 0 && totalPages > 1 && (
+                  <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl border border-neutral-200 mt-4 shadow-sm gap-4">
+                    <span className="text-sm text-neutral-500">
+                      Showing <span className="font-medium text-navy">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-navy">{Math.min(currentPage * itemsPerPage, totalTherapists)}</span> of <span className="font-medium text-navy">{totalTherapists}</span> results
+                    </span>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm font-medium text-sm"
+                      >
+                        Previous
+                      </button>
+                      <button 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm font-medium text-sm"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {totalTherapists === 0 && (
                   <div className="col-span-full bg-white p-12 rounded-3xl text-center text-neutral-500 shadow-sm border border-neutral-100 flex flex-col items-center">
                     <Search size={48} className="text-neutral-300 mb-4" />
                     <h4 className="text-lg font-bold text-navy mb-1">No therapists found</h4>

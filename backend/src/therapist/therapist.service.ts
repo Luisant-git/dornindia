@@ -9,8 +9,27 @@ export class TherapistService {
     return this.prisma.therapist.create({ data });
   }
 
+  async getFilters() {
+    const batches = await this.prisma.therapist.findMany({
+      select: { batch: true },
+      distinct: ['batch'],
+      where: { batch: { not: null } }
+    });
+    
+    const dates = await this.prisma.therapist.findMany({
+      select: { date: true },
+      distinct: ['date'],
+      where: { date: { not: null } }
+    });
+
+    const uniqueBatches = batches.map(b => b.batch).filter(Boolean).sort();
+    const uniqueYears = [...new Set(dates.map(d => d.date ? d.date.split('-')[0] : null).filter(Boolean))].sort();
+
+    return { batches: uniqueBatches, years: uniqueYears };
+  }
+
   async findAll(query: any) {
-    const { page = 1, limit = 10, search = '', designation, isActive, startDate, endDate } = query;
+    const { page = 1, limit = 10, search = '', designation, isActive, startDate, endDate, batch, year } = query;
 
     const pageNum = parseInt(String(page), 10) || 1;
     const limitNum = parseInt(String(limit), 10) || 10;
@@ -34,8 +53,16 @@ export class TherapistService {
       where.isActive = isActive === 'true';
     }
 
+    if (batch && batch !== 'all') {
+      where.batch = batch;
+    }
+
+    if (year && year !== 'all') {
+      where.date = { startsWith: year };
+    }
+
     if (startDate || endDate) {
-      where.date = {};
+      where.date = where.date || {};
       if (startDate) where.date.gte = startDate;
       if (endDate) where.date.lte = endDate;
     }
