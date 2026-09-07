@@ -14,6 +14,11 @@ export class TutorialController {
     return this.tutorialService.create(createData);
   }
 
+  @Get('info/youtube')
+  getYoutubeInfo(@Query('url') url: string) {
+    return this.tutorialService.getYoutubeInfo(url);
+  }
+
   @Get()
   findAll(@Query() query: any) {
     return this.tutorialService.findAll(query);

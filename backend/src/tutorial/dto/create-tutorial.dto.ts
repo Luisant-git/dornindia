@@ -22,6 +22,11 @@ export class CreateTutorialDto {
   @IsString()
   thumbnail?: string;
 
+  @ApiProperty({ example: '10:00', required: false })
+  @IsOptional()
+  @IsString()
+  duration?: string;
+
   @ApiProperty({ example: 'https://youtube.com/...', required: false })
   @IsOptional()
   @IsString()

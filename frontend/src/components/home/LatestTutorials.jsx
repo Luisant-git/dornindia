@@ -13,9 +13,9 @@ const LatestTutorials = () => {
         const mapped = data.map(t => ({
           id: t.id,
           title: t.title,
-          category: t.category,
-          uploadDate: t.category || 'Tutorial',
-          duration: 'Video',
+          category: t.category || 'Tutorial',
+          uploadDate: new Date(t.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          duration: t.duration || 'Video',
           description: t.description,
           thumbnail: t.thumbnail,
           videoUrl: t.videoUrl,

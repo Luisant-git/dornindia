@@ -75,4 +75,31 @@ export class TutorialService {
     await this.findOne(id);
     return this.prisma.tutorial.delete({ where: { id } });
   }
+
+  async getYoutubeInfo(url: string) {
+    try {
+      if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+        return { duration: '' };
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      const html = await response.text();
+
+      const match = html.match(/"lengthSeconds":"(\d+)"/);
+      if (match && match[1]) {
+        const totalSeconds = parseInt(match[1], 10);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        const duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        return { duration };
+      }
+      return { duration: '' };
+    } catch (error) {
+      return { duration: '' };
+    }
+  }
 }

@@ -21,7 +21,8 @@ const AdminTutorials = () => {
     description: '',
     thumbnail: null,
     thumbnailFile: null,
-    videoUrl: ''
+    videoUrl: '',
+    duration: ''
   });
 
   useEffect(() => {
@@ -47,11 +48,12 @@ const AdminTutorials = () => {
         description: tut.description || '',
         thumbnail: tut.thumbnail || null,
         thumbnailFile: null,
-        videoUrl: tut.videoUrl || ''
+        videoUrl: tut.videoUrl || '',
+        duration: tut.duration || ''
       });
     } else {
       setEditingId(null);
-      setFormData({ title: '', category: '', description: '', thumbnail: null, thumbnailFile: null, videoUrl: '' });
+      setFormData({ title: '', category: '', description: '', thumbnail: null, thumbnailFile: null, videoUrl: '', duration: '' });
     }
     setIsModalOpen(true);
   };
@@ -82,6 +84,27 @@ const AdminTutorials = () => {
     return url;
   };
 
+  const handleUrlChange = async (e) => {
+    const url = e.target.value;
+
+    if (url && (url.includes('youtube.com') || url.includes('youtu.be'))) {
+      try {
+        const response = await fetch(`${config.API_BASE_URL}/tutorials/info/youtube?url=${encodeURIComponent(url)}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.duration) {
+            setFormData(prev => ({ ...prev, duration: data.duration }));
+            toast.success(`Automatically fetched duration: ${data.duration}`);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch duration:', error);
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -94,6 +117,7 @@ const AdminTutorials = () => {
         category: formData.category,
         description: formData.description,
         videoUrl: formData.videoUrl,
+        duration: formData.duration,
         thumbnail: thumbnailUrl
       };
       if (editingId) {
@@ -279,7 +303,10 @@ const AdminTutorials = () => {
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Title:</strong> {formData.title || '-'}</div>
                       <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Category:</strong> {formData.category || '-'}</div>
                       {formData.videoUrl && (
-                        <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Video URL:</strong> {formData.videoUrl}</div>
+                        <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Video URL:</strong> <a href={formData.videoUrl} target="_blank" rel="noopener noreferrer" className="text-[#00a3e0] hover:underline">{formData.videoUrl}</a></div>
+                      )}
+                      {formData.duration && (
+                        <div className="text-[15px] text-neutral-800"><strong className="text-black font-bold">Duration:</strong> {formData.duration}</div>
                       )}
                       <div>
                         <strong className="text-black font-bold block mb-1">Description:</strong>
@@ -328,12 +355,17 @@ const AdminTutorials = () => {
                       <input required type="text" placeholder="e.g., Overview, Self-Care" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
                     
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-1">
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Video URL <span className="text-red-500">*</span></label>
                       <div className="relative">
                         <Link2 size={16} className="absolute left-3.5 top-3 text-neutral-400" />
-                        <input required type="text" placeholder="https://www.youtube.com/watch?v=..." value={formData.videoUrl} onChange={e => setFormData({...formData, videoUrl: e.target.value})} className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
+                        <input required type="text" placeholder="https://www.youtube.com/watch?v=..." value={formData.videoUrl} onChange={e => setFormData({...formData, videoUrl: e.target.value})} onBlur={handleUrlChange} className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                       </div>
+                    </div>
+
+                    <div className="md:col-span-1">
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Duration <span className="text-red-500">*</span></label>
+                      <input required type="text" placeholder="e.g., 10:30" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white placeholder:text-gray-400" />
                     </div>
                     
                     <div className="md:col-span-2">

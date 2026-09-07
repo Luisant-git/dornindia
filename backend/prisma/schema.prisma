@@ -50,6 +50,7 @@ model Tutorial {
   id          Int      @id @default(autoincrement())
   title       String
   category    String?
+  duration    String?
   description String?
   thumbnail   String?
   videoUrl    String?
