@@ -13,7 +13,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const navItems = [
     { name: 'Dashboard', path: '/admin', icon: <LayoutDashboard size={20} /> },
-    { name: 'Therapists Master', path: '/admin/therapists', icon: <Users size={20} /> },
+    { name: 'Alumini Master', path: '/admin/therapists', icon: <Users size={20} /> },
     { name: 'Classes Master', path: '/admin/classes', icon: <BookOpen size={20} /> },
     { name: 'Tutorials Master', path: '/admin/tutorials', icon: <Video size={20} /> },
     { name: 'Feedback Master', path: '/admin/feedback', icon: <MessageSquare size={20} /> },

@@ -76,10 +76,10 @@ const AdminTherapists = () => {
     try {
       await therapistsApi.delete(deleteId);
       setTherapists(prev => prev.filter(t => t.id !== deleteId));
-      toast.success('Therapist deleted successfully');
+      toast.success('Alumini deleted successfully');
     } catch (error) {
       console.error('Failed to delete therapist:', error);
-      toast.error('Failed to delete therapist');
+      toast.error('Failed to delete alumini');
     }
     setDeleteId(null);
   };
@@ -119,16 +119,16 @@ const AdminTherapists = () => {
       if (editingId) {
         const updated = await therapistsApi.update(editingId, payload);
         setTherapists(prev => prev.map(t => t.id === editingId ? updated : t));
-        toast.success('Therapist updated successfully');
+        toast.success('Alumini updated successfully');
       } else {
         const created = await therapistsApi.create(payload);
         setTherapists(prev => [created, ...prev]);
-        toast.success('Therapist added successfully');
+        toast.success('Alumini added successfully');
       }
       setIsModalOpen(false);
     } catch (error) {
       console.error('Failed to save therapist:', error);
-      toast.error('Failed to save therapist');
+      toast.error('Failed to save alumini');
     }
   };
 
@@ -164,15 +164,15 @@ const AdminTherapists = () => {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-heading font-bold text-navy tracking-tight">Therapists Master</h1>
-          <p className="text-neutral-500 mt-1">Manage therapists, instructors, and practitioners.</p>
+          <h1 className="text-2xl md:text-3xl font-heading font-bold text-navy tracking-tight">Alumini Master</h1>
+          <p className="text-neutral-500 mt-1">Manage alumini, instructors, and practitioners.</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
           className="bg-[#00a3e0] hover:bg-[#0082b3] text-white px-5 py-2.5 rounded-xl flex items-center justify-center transition-all shadow-[0_4px_15px_rgba(0,163,224,0.3)] hover:shadow-[0_6px_20px_rgba(0,163,224,0.4)] hover:-translate-y-0.5 font-medium w-full sm:w-auto"
         >
           <Plus size={18} className="mr-2" />
-          Add Therapist
+          Add Alumini
         </button>
       </div>
 
@@ -262,7 +262,7 @@ const AdminTherapists = () => {
             </tbody>
           </table>
           {filteredTherapists.length === 0 && (
-            <div className="p-8 text-center text-neutral-500">No therapists found.</div>
+            <div className="p-8 text-center text-neutral-500">No alumini found.</div>
           )}
         </div>
 
@@ -298,7 +298,7 @@ const AdminTherapists = () => {
             
             {/* Header */}
             <div className="px-8 pt-8 pb-4 flex justify-between items-center bg-white shrink-0">
-              <h2 className="text-[22px] font-bold text-black">{isViewMode ? 'Therapist Details' : editingId ? 'Edit Therapist' : 'Add Therapist'}</h2>
+              <h2 className="text-[22px] font-bold text-black">{isViewMode ? 'Alumini Details' : editingId ? 'Edit Alumini' : 'Add Alumini'}</h2>
               <button type="button" onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-black text-2xl font-light leading-none">&times;</button>
             </div>
             
@@ -409,8 +409,8 @@ const AdminTherapists = () => {
               <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
                 <Trash2 size={24} className="text-red-600" />
               </div>
-              <h3 className="text-lg font-bold text-black mb-2">Delete Therapist</h3>
-              <p className="text-sm text-neutral-500">Are you sure you want to delete this therapist? This action cannot be undone.</p>
+              <h3 className="text-lg font-bold text-black mb-2">Delete Alumini</h3>
+              <p className="text-sm text-neutral-500">Are you sure you want to delete this alumini? This action cannot be undone.</p>
             </div>
             <div className="px-6 py-4 bg-neutral-50 flex items-center justify-center gap-3 border-t border-neutral-100">
               <button onClick={() => setDeleteId(null)} className="flex-1 px-5 py-2.5 bg-[#4b5563] text-white rounded-xl text-sm hover:bg-[#374151] transition-colors font-semibold shadow-sm text-center">
