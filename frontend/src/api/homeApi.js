@@ -26,10 +26,32 @@ export const homeApi = {
   },
 
   getTestimonials: async (limit = 3) => {
-    const response = await fetch(`${API_URL}/feedbacks?limit=${limit}`, {
+    const response = await fetch(`${API_URL}/feedbacks?limit=${limit}&isActive=true`, {
       headers: { 'Content-Type': 'application/json' },
     });
     if (!response.ok) throw new Error('Failed to fetch feedbacks');
     return normalize(await response.json(), limit);
+  },
+
+  createFeedback: async (data) => {
+    const response = await fetch(`${API_URL}/feedbacks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to submit feedback');
+    return response.json();
+  },
+
+  uploadImage: async (file) => {
+    const body = new FormData();
+    body.append('image', file);
+    const response = await fetch(`${API_URL}/upload`, {
+      method: 'POST',
+      body,
+    });
+    if (!response.ok) throw new Error('Failed to upload image');
+    const { url } = await response.json();
+    return url;
   },
 };

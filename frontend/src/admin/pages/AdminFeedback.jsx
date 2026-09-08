@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Plus, Trash2, Eye, SquarePen, ChevronLeft, ChevronRight, Search, Upload, X, Star, StarHalf } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { feedbackApi } from '../api/feedbackApi';
-import config from '../config.js';
+import { uploadApi } from '../api/uploadApi';
 
 const AdminFeedback = () => {
   const toast = useToast();
@@ -21,7 +21,8 @@ const AdminFeedback = () => {
     rating: 5,
     feedback: '',
     image: null,
-    imageFile: null
+    imageFile: null,
+    isActive: true
   });
 
   useEffect(() => {
@@ -47,11 +48,12 @@ const AdminFeedback = () => {
         rating: fb.rating || 5,
         feedback: fb.feedback || '',
         image: fb.image || null,
-        imageFile: null
+        imageFile: null,
+        isActive: fb.isActive !== undefined ? fb.isActive : true
       });
     } else {
       setEditingId(null);
-      setFormData({ name: '', profession: '', rating: 5, feedback: '', image: null, imageFile: null });
+      setFormData({ name: '', profession: '', rating: 5, feedback: '', image: null, imageFile: null, isActive: true });
     }
     setIsModalOpen(true);
   };
@@ -69,32 +71,20 @@ const AdminFeedback = () => {
     setDeleteId(null);
   };
 
-  const uploadImage = async (file) => {
-    const body = new FormData();
-    body.append('image', file);
-    const response = await fetch(`${config.API_BASE_URL}/upload`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
-      body
-    });
-    if (!response.ok) throw new Error('Failed to upload image');
-    const { url } = await response.json();
-    return url;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       let imageUrl = formData.image;
       if (formData.imageFile) {
-        imageUrl = await uploadImage(formData.imageFile);
+        imageUrl = await uploadApi.uploadImage(formData.imageFile);
       }
       const payload = {
         name: formData.name,
         profession: formData.profession,
         rating: Number(formData.rating),
         feedback: formData.feedback,
-        image: imageUrl
+        image: imageUrl,
+        isActive: formData.isActive
       };
       if (editingId) {
         const updated = await feedbackApi.update(editingId, payload);
@@ -112,19 +102,39 @@ const AdminFeedback = () => {
     }
   };
 
-  const hasActiveFilters = searchTerm;
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const handleToggleActive = async (id) => {
+    try {
+      const updated = await feedbackApi.toggleActive(id);
+      setFeedbacksList(prev => prev.map(f => f.id === id ? updated : f));
+      toast.success(updated.isActive ? 'Feedback approved and published' : 'Feedback hidden');
+    } catch (error) {
+      console.error('Failed to toggle feedback status:', error);
+      toast.error('Failed to change feedback status');
+    }
+  };
+
+  const hasActiveFilters = searchTerm || statusFilter !== 'all';
 
   const clearAllFilters = () => {
     setSearchTerm('');
+    setStatusFilter('all');
     setCurrentPage(1);
   };
 
   const filteredFeedbacks = feedbacksList.filter(f => {
     const term = searchTerm.toLowerCase();
-    return !searchTerm ||
+    const matchesSearch = !searchTerm ||
       (f.name || '').toLowerCase().includes(term) ||
       (f.profession || '').toLowerCase().includes(term) ||
       (f.feedback || '').toLowerCase().includes(term);
+    
+    const matchesStatus = statusFilter === 'all' || 
+      (statusFilter === 'approved' && f.isActive) ||
+      (statusFilter === 'pending' && !f.isActive);
+
+    return matchesSearch && matchesStatus;
   });
 
   const totalPages = Math.ceil(filteredFeedbacks.length / itemsPerPage);
@@ -180,6 +190,18 @@ const AdminFeedback = () => {
               />
               <Search size={18} className="absolute left-3.5 top-3 text-neutral-400" />
             </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
+            >
+              <option value="all">All Status</option>
+              <option value="approved">Approved</option>
+              <option value="pending">Pending</option>
+            </select>
             {hasActiveFilters && (
               <button onClick={clearAllFilters} className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium border border-red-200">
                 <X size={14} /> Clear
@@ -199,6 +221,7 @@ const AdminFeedback = () => {
                 <th className="p-4 font-medium">Profession</th>
                 <th className="p-4 font-medium">Rating</th>
                 <th className="p-4 font-medium">Feedback</th>
+                <th className="p-4 font-medium">Status</th>
                 <th className="p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
@@ -218,6 +241,18 @@ const AdminFeedback = () => {
                   <td className="p-4">{rateStars(f.rating)}</td>
                   <td className="p-4 text-sm text-neutral-600 max-w-xs truncate" title={f.feedback}>
                     {f.feedback || '-'}
+                  </td>
+                  <td className="p-4">
+                    <button 
+                      onClick={() => handleToggleActive(f.id)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${
+                        f.isActive 
+                          ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' 
+                          : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
+                      }`}
+                    >
+                      {f.isActive ? 'Approved' : 'Pending'}
+                    </button>
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2 transition-opacity">
@@ -386,6 +421,18 @@ const AdminFeedback = () => {
                     <div className="md:col-span-2">
                       <label className="block text-[14px] font-medium text-slate-700 mb-2">Feedback <span className="text-red-500">*</span></label>
                       <textarea rows="4" required placeholder="Therapist feedback" value={formData.feedback} onChange={e => setFormData({...formData, feedback: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm resize-none transition-all shadow-sm bg-white placeholder:text-gray-400"></textarea>
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-[14px] font-medium text-slate-700 mb-2">Status</label>
+                      <select 
+                        value={formData.isActive ? 'true' : 'false'} 
+                        onChange={e => setFormData({...formData, isActive: e.target.value === 'true'})} 
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-[#00a3e0]/20 focus:border-[#00a3e0] text-sm transition-all shadow-sm bg-white"
+                      >
+                        <option value="true">Approved</option>
+                        <option value="false">Pending</option>
+                      </select>
                     </div>
                     
                   </div>

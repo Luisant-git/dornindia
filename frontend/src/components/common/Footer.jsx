@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import FeedbackModal from './FeedbackModal';
 
 const Footer = () => {
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+
   return (
     <footer className="w-full">
       {/* Top Footer - Social Icons */}
@@ -25,12 +28,16 @@ const Footer = () => {
         <p className="text-white mb-2">
           &copy; {new Date().getFullYear()} copyright: Dorn India - Dr. K. Subash Mani
         </p>
-        <div className="text-dorn flex gap-2 font-semibold">
+        <div className="text-dorn flex gap-2 font-semibold items-center">
           <Link to="/about" className="hover:text-white transition-colors">Imprint</Link>
-          <span>-</span>
+          <span className="text-neutral-500">-</span>
           <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
+          <span className="text-neutral-500">-</span>
+          <button onClick={() => setIsFeedbackModalOpen(true)} className="hover:text-white transition-colors focus:outline-none">Feedback</button>
         </div>
       </div>
+      
+      <FeedbackModal isOpen={isFeedbackModalOpen} onClose={() => setIsFeedbackModalOpen(false)} />
     </footer>
   );
 };

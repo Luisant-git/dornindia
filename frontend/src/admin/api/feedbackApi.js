@@ -45,4 +45,13 @@ export const feedbackApi = {
     if (!response.ok) throw new Error('Failed to delete feedback');
     return response.json();
   },
+
+  toggleActive: async (id) => {
+    const response = await fetch(`${API_URL}/${id}/toggle`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+    });
+    if (!response.ok) throw new Error('Failed to toggle feedback status');
+    return response.json();
+  },
 };
